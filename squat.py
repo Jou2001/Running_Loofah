@@ -6,7 +6,6 @@ cam = cv2.VideoCapture(1)
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 status = False
-# pose = mp_pose.Pose(static_image_mode=False, model_complexity=1)
 
 pose = mp_pose.Pose()
 
