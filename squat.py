@@ -5,15 +5,12 @@ import numpy as np
 cam = cv2.VideoCapture(1)
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
-# h = 0
-# w = 0
 status = False
 # pose = mp_pose.Pose(static_image_mode=False, model_complexity=1)
 
 pose = mp_pose.Pose()
 
 def angle_between_points(a, b, c):
-    # print(b.z)
     ba = np.array([a.x - b.x, a.y - b.y, a.z - b.z])
     bc = np.array([c.x - b.x, c.y - b.y, c.z - b.z])
     
