@@ -79,7 +79,6 @@ def main():
                  
             elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and \
             ( ( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色
-            # return 2
                 cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
 
             else:

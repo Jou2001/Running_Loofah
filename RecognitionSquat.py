@@ -31,8 +31,6 @@ def main(preview):
     results = pose.process(rgbframe) # 從影像增測姿勢    
 
     if results.pose_world_landmarks:
-        # mp_drawing.draw_landmarks(preview, results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
-        # 获取关键点坐标
         hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
         hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
         knee_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_KNEE]
@@ -40,7 +38,6 @@ def main(preview):
         ankle_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE]
         ankle_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
 
-        # 计算角度
         angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
         angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
 
