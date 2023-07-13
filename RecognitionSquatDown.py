@@ -60,15 +60,20 @@ def main():
             angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
             angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
 
-            
-            if (angle_left_knee <= 180 and angle_left_knee >= 150 and angle_right_knee >= 90 and angle_right_knee <= 120)or (angle_right_knee <= 180 and angle_right_knee >= 150 and angle_left_knee >= 90 and angle_left_knee <= 120): # 綠色 標準動作
-                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (1400, 920), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
-                 
-            if (angle_left_knee < 150 and angle_left_knee >= 120 and angle_right_knee > 120 and angle_right_knee <= 150) or (angle_right_knee <= 150 and angle_right_knee >= 120 and angle_left_knee > 120 and angle_left_knee <= 150): # 黃色
-                cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+            # GREEN
+            if (angle_left_knee <= 180 and angle_left_knee >= 150 and angle_right_knee >= 90 and angle_right_knee <= 120)or (angle_right_knee <= 180 and angle_right_knee >= 150 and angle_left_knee >= 90 and angle_left_knee <= 120):
+                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Right Angle: {:f}".format(angle_right_knee), (400, 410), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
+             # YELLOW
+            elif (angle_left_knee < 150 and angle_left_knee >= 120 and angle_right_knee > 120 and angle_right_knee <= 150) or (angle_right_knee <= 150 and angle_right_knee >= 120 and angle_left_knee > 120 and angle_left_knee <= 150):
+                cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Right Angle: {:f} ".format(angle_right_knee), (400, 410), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
+
+             # RED
             else:
-                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (1400, 920), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Right Angle: {:f}".format(angle_right_knee), (400, 410), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
         cv2.imshow('frame', preview)
         
