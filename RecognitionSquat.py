@@ -31,6 +31,8 @@ def main(preview):
     results = pose.process(rgbframe) # 從影像增測姿勢    
 
     if results.pose_world_landmarks:
+        # mp_drawing.draw_landmarks(preview, results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
+        
         hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
         hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
         knee_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_KNEE]
@@ -41,7 +43,6 @@ def main(preview):
         angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
         angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
 
-        # 左腳
         if (angle_left_knee >= 90 and angle_left_knee <= 120) and (angle_right_knee >= 90 and angle_right_knee <= 120): # 綠色 標準動作
             return 1
         elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and ( ( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色

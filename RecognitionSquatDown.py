@@ -47,7 +47,7 @@ def main():
         preview = frame.copy()
 
         if results.pose_world_landmarks:
-
+            # mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
             # Leg
             hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
             hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
