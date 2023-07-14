@@ -1,4 +1,4 @@
-# spritee
+# sprite
 from typing import Any
 import pygame
 import random
@@ -26,7 +26,10 @@ WIDTH = 960
 HEIGHT = 600
 PLAYER_Y = 270
 HEALTH = 100
-gravity = 3
+BAR_LENGTH = 200
+BAR_HEIGHT = 20
+PLAYER_JUMP = 2
+gravity = 5
 # define speed
 fps = 60 # 每秒60幀 
 # define time
@@ -110,6 +113,14 @@ class Player(pygame.sprite.Sprite) :
         self.radius = 100
         self.run_time = 0
         self.health = HEALTH
+        self.countJump = PLAYER_JUMP
+        self.mode = 0
+        self.key_pressed = 0
+
+    def count_jump(self) :
+        self.countJump -= 1
+        if self.countJump < 0 :
+            self.countJump = 0
     
     def change_post(self) :
         self.run_time += 1
@@ -118,26 +129,40 @@ class Player(pygame.sprite.Sprite) :
         self.image = load_image[self.run_time]
 
     def update(self) :
-        mode = RecognitionSquat.main(preview)
+        self.mode = RecognitionSquat.main(preview)
         key_pressed = pygame.key.get_pressed()
         self.change_post()
-
-        if mode == 1 and self.change_y == 0:
-            self.change_y = 60
-        # if key_pressed[pygame.K_UP] and self.change_y == 0:
-        #    self.change_y = 60
+        
+        if self.mode == 1 and self.change_y == 0 and self.countJump >= 0 :
+        # if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]
+           print( "pressed\n" )
+           self.change_y = 60
+           self.countJump = PLAYER_JUMP
 
         if self.change_y > 0 or self.rect.y < PLAYER_Y :
             self.rect.y -= self.change_y
             self.change_y -= gravity
-        
-        if self.rect.y > PLAYER_Y :
+            if self.countJump > 0 and self.change_y < 0 and self.mode != 3 :
+            #if self.countJump > 0 and self.change_y < 0 and ( key_pressed[pygame.K_UP] or key_pressed[pygame.K_RIGHT] ) :
+                self.rect.y += self.change_y
+                self.change_y += gravity
+            if self.countJump > 0 and self.change_y < 0 and self.mode == 3 :
+            #if self.countJump > 0 and self.change_y < 0 and ( not key_pressed[pygame.K_UP] and not key_pressed[pygame.K_RIGHT] ) :
+                self.countJump = 0
+
+        # keep height and low
+        if self.rect.y >= PLAYER_Y : 
             self.rect.y = PLAYER_Y
+            self.countJump = PLAYER_JUMP
         if self.rect.y < 50 :
             self.rect.y = 50
         
         if self.rect.y == PLAYER_Y and self.change_y < 0 :
             self.change_y = 0
+
+        print( "count: ", self.countJump, " change_y: ", self.change_y )
+
+            
 
 class Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -146,7 +171,7 @@ class Obstacle(pygame.sprite.Sprite) :
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(960,1200)
         self.rect.bottom = 500
-        self.speed_X = 3
+        self.speed_X = 10
         self.radius = 10
         self.randomtype = random.randrange(0,2)
        
@@ -158,7 +183,7 @@ class Obstacle(pygame.sprite.Sprite) :
         self.rect.x -= self.speed_X
         if self.rect.right < 0 :
             self.rect.x = random.randrange(960,1200)
-            self.speed_X = random.randrange(5,8)
+            self.speed_X = 10
             self.change_obstacle()
 
 class Ground1(pygame.sprite.Sprite) :
@@ -197,8 +222,6 @@ def New_Obstacle(all_sprites, obstacles) :
 def draw_health(surf, hp, x, y ):
     if hp < 0:
       hp = 0
-    BAR_LENGTH = 200
-    BAR_HEIGHT = 20
     fill = (hp/100) * BAR_LENGTH
     outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
@@ -223,7 +246,10 @@ def run():
 
         if show_init :
             draw_init()
-
+            # init timer
+            time = 200
+            now = pygame.time.get_ticks()
+            past = now
             # open camera
             cap = cv2.VideoCapture(0)
 
@@ -279,6 +305,31 @@ def run():
         screen.blit(frame, ( 0, 500 ) )
         draw_health(screen, player.health, 60, 32 )
         screen.blit(healthstate_head, (10,10))
+        # timer
+        now = pygame.time.get_ticks()
+        # print( "now: ", now, " past: ", past, "now-past: ", ( now - past ) / 1000 )
+        if ( int(( now - past ) / 1000) == 1 ) :
+            past = now
+            time -= 1
+            player.count_jump()
+        
+        secs = time % 60
+        mins = int(time/60) % 60
+        hours = int(time/3600) % 24
+        draw_text( screen, f"{hours:02}:{mins:02}:{secs:02}", 20, WIDTH/2, BAR_HEIGHT )
+        if ( time == -1 ) :
+            show_init = True
+
+        player.key_pressed = pygame.key.get_pressed()
+        if player.mode == 1 :
+        #if player.key_pressed[pygame.K_UP] :
+            draw_text( screen, "Good!" + str( player.countJump ) + str( player.change_y ), 20, WIDTH/2, BAR_HEIGHT + 20 )
+        elif player.mode == 2 :
+        #elif player.key_pressed[pygame.K_RIGHT] :
+            draw_text( screen, "So so!" + str( player.countJump ) + str( player.change_y ), 20, WIDTH/2, BAR_HEIGHT + 20 )
+        else :
+            draw_text( screen, "Bad!" + str( player.countJump ) + str( player.change_y ), 20, WIDTH/2, BAR_HEIGHT + 20 )
+
         pygame.display.update()
 
     pygame.quit()

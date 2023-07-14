@@ -41,13 +41,13 @@ def main():
             print("Read Error")
             break
         frame = cv2.flip(frame, 1) #矩陣左右翻轉   ******
-        rgbframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        rgbframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) 
         results = pose.process(rgbframe) # 從影像增測姿勢    
         h, w, _ = frame.shape # (480, 640, 3)
         preview = frame.copy()
 
         if results.pose_world_landmarks:
-            # mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+            mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
             # Leg
             hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
             hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
@@ -60,20 +60,15 @@ def main():
             angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
             angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
 
-            # GREEN
-            if (angle_left_knee <= 180 and angle_left_knee >= 150 and angle_right_knee >= 90 and angle_right_knee <= 120)or (angle_right_knee <= 180 and angle_right_knee >= 150 and angle_left_knee >= 90 and angle_left_knee <= 120):
-                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
-                cv2.putText(preview, "Right Angle: {:f}".format(angle_right_knee), (400, 410), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
-
-             # YELLOW
-            elif (angle_left_knee < 150 and angle_left_knee >= 120 and angle_right_knee > 120 and angle_right_knee <= 150) or (angle_right_knee <= 150 and angle_right_knee >= 120 and angle_left_knee > 120 and angle_left_knee <= 150):
+            
+            if (angle_left_knee <= 180 and angle_left_knee >= 150 and angle_right_knee >= 90 and angle_right_knee <= 120)or (angle_right_knee <= 180 and angle_right_knee >= 150 and angle_left_knee >= 90 and angle_left_knee <= 120): # 綠色 標準動作
+                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (1400, 920), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
+                 
+            elif (angle_left_knee < 150 and angle_left_knee >= 120 and angle_right_knee > 120 and angle_right_knee <= 150) or (angle_right_knee <= 150 and angle_right_knee >= 120 and angle_left_knee > 120 and angle_left_knee <= 150): # 黃色
                 cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
-                cv2.putText(preview, "Right Angle: {:f} ".format(angle_right_knee), (400, 410), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
 
-             # RED
             else:
-                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
-                cv2.putText(preview, "Right Angle: {:f}".format(angle_right_knee), (400, 410), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (1400, 920), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
 
         cv2.imshow('frame', preview)
         
