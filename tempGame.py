@@ -98,37 +98,38 @@ def draw_start() :
     init_time = 30
     time = init_time
     active = 1
-    while waiting :
+    while waiting:
         timer.tick(fps)
         time, past = times_1(time, past)
         screen.blit(background1_img, (0,0))
         if time >= init_time - 2 :
             draw_text( screen, "PLEASE DO THE FOLLOWING", 50, WIDTH/2, HEIGHT/10 ) # 60
-        else :
-            waiting = False
-            # key_pressed = pygame.key.get_pressed()
-            # print( key_pressed[pygame.K_RIGHT] )
-            # if active == 1 :
-            #     draw_text( screen, "HOW TO JUMP", 50, WIDTH/2, HEIGHT/10 ) # 60
-            #     if key_pressed[pygame.K_RIGHT] :
-            #         print( "????????????" )
-            #         active += 1
-            # elif active == 2 :
-            #     draw_text( screen, "HOW TO SLIP", 50, WIDTH/2, HEIGHT/10 ) # 60
-            #     if key_pressed[pygame.K_UP] :
-            #         active += 1
-            # elif active == 3 :
-            #     draw_text( screen, "HOW TO ATTACK", 50, WIDTH/2, HEIGHT/10 ) # 60
-            #     if key_pressed[pygame.K_UP] :
-            #         active += 1
-            # else :
-            #     waiting = False
-        
+        else:
+            if active == 1 :
+                draw_text( screen, "HOW TO JUMP", 50, WIDTH/2, HEIGHT/10 ) # 60
+            elif active == 2 :
+                draw_text( screen, "HOW TO SLIP", 50, WIDTH/2, HEIGHT/10 ) # 60
+            elif active == 3 :
+                draw_text( screen, "HOW TO ATTACK", 50, WIDTH/2, HEIGHT/10 ) # 60
+            else:
+                waiting = False
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if active == 1 and event.key == pygame.K_UP:
+                        print( "????????????" )
+                        active += 1
+                    elif active == 2 and event.key == pygame.K_UP:
+                        active += 1
+                    elif active == 3 and event.key == pygame.K_UP:
+                        active += 1
+                    
         pygame.display.update()
+
 
     
 def draw_init() :
-    global player_slip_img, healthstate_head, obstacle
+    global player_slip_img, healthstate_head
     screen.blit(background1_img, (0,0))
     draw_text( screen, 'running loofah', 65, WIDTH/2, HEIGHT/10 )
     draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
@@ -163,9 +164,9 @@ def draw_init() :
     player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
     healthstate_head = pygame.image.load(os.path.join("picture","player" , "HEALTHHEAD_1.png")).convert_alpha()
     healthstate_head = pygame.transform.scale( healthstate_head, (58, 53) )
-    for i in range( 3 ) :
-      image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
-      obstacle.append( image )
+    # for i in range( 3 ) :
+    #   image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+    #   obstacle.append( image )
 
 def times_1(time, past) :
     now = pygame.time.get_ticks()
@@ -219,8 +220,8 @@ class Player(pygame.sprite.Sprite) :
         key_pressed = pygame.key.get_pressed()
         self.change_post()
         
-        if self.mode == 1 and self.change_y == 0 and self.countJump >= 0 :
-        # if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]
+        # if self.mode == 1 and self.change_y == 0 and self.countJump >= 0 :
+        if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]
            print( "pressed\n" )
            self.change_y = 60
            self.countJump = PLAYER_JUMP
@@ -249,16 +250,37 @@ class Player(pygame.sprite.Sprite) :
         # print( "count: ", self.countJump, " change_y: ", self.change_y ) 
 
 class Obstacle(pygame.sprite.Sprite) :
-    global obstacle
     def __init__(self) :
-        pygame.sprite.Sprite.__init__(self)
-        self.image = obstacle[random.randint(0,2)]
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(960,1200)
-        self.rect.bottom = 500
-        self.speed_X = 10
+        self.speed_X = 15
         self.radius = 10
         self.randomtype = random.randrange(0,2)
+        for i in range( 3 ) :
+            image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+            obstacle.append( image )
+
+    def obstacle1(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = obstacle[0]
+        self.rect = self.image.get_rect()
+        self.rect.x = 960
+        self.rect.bottom = 500
+        
+
+    def obstacle2(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = obstacle[1]
+        self.rect = self.image.get_rect()
+        self.rect.x = 960
+        self.rect.bottom = 500
+        
+
+    def obstacle3(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = obstacle[2]
+        self.rect = self.image.get_rect()
+        self.rect.x = 960
+        self.rect.bottom = 500
+        
        
     def change_obstacle(self) :
         self.randomtype = random.randrange(0,2)
@@ -267,9 +289,9 @@ class Obstacle(pygame.sprite.Sprite) :
     def update(self) :
         self.rect.x -= self.speed_X
         if self.rect.right < 0 :
-            self.rect.x = random.randrange(960,1200)
-            self.speed_X = 10
-            self.change_obstacle()
+            self.rect.x = 960
+            self.speed_X = 15
+            # self.change_obstacle()
 
 class Ground1(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -299,8 +321,14 @@ class Ground2(pygame.sprite.Sprite) :
         if self.rect.right < 0 :
             self.rect.x = WIDTH - 10
 
-def New_Obstacle(all_sprites, obstacles) :
+def New_Obstacle(all_sprites, obstacles, kind) :
     o = Obstacle()
+    if kind == 1:
+        o.obstacle1()
+    elif kind == 2:
+        o.obstacle2()
+    else:
+        o.obstacle3()
     all_sprites.add(o)
     obstacles.add(o)    
 
@@ -372,8 +400,9 @@ def run():
             #frame = cv2.resize(frame, (650, 500))
 
             # Create obstacle
+            print("time: ", time, " past: ", past, " change:", changeTime)
             if changeTime:
-                Set1.Run(time, all_sprites, obstacles, obstacle)
+                Set1.Run(time, all_sprites, obstacles)
             
             # update game
             all_sprites.update()
@@ -409,7 +438,7 @@ def run():
 
             player.key_pressed = pygame.key.get_pressed()
             if player.mode == 1 :
-            #if player.key_pressed[pygame.K_UP] :
+            # if player.key_pressed[pygame.K_UP] :
                 draw_text( screen, "Good!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
             elif player.mode == 2 :
             #elif player.key_pressed[pygame.K_RIGHT] :
