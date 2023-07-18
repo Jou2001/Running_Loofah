@@ -10,10 +10,21 @@ status = False
 h = 0
 w = 0
 
- 
-def angle_between_points(a, b, c):
+def get_mid_point(a, b, mid):
+    mid.x = (a.x + b.x)/2
+    mid.y = (a.y + b.y)/2
+    mid.z = (a.z + b.z)/2
+    return mid
+
+def get_vector(a, b, c):
     ba = np.array([a.x - b.x, a.y - b.y, a.z - b.z])
     bc = np.array([c.x - b.x, c.y - b.y, c.z - b.z])
+    return ba, bc
+
+
+def angle_between_points(a, b, c):
+
+    ba, bc = get_vector(a, b, c)
 
     dot = np.dot(ba, bc) # 內積(distance_ba * distance_bc * cos0)
     distance_ba = np.linalg.norm(ba)
@@ -62,29 +73,35 @@ def main():
             knee_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_KNEE]
             ankle_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE]
             ankle_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
+            hip_middle = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
+            hip_middle = get_mid_point(hip_left, hip_right, hip_middle)
 
             angle_left_hand = angle_between_points(wrist_left, elbow_left, shoulder_left)
             angle_right_hand = angle_between_points(wrist_right, elbow_right, shoulder_right)
             angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
             angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
+            angle_two_leg = angle_between_points(knee_left, hip_middle, knee_right)
             
             # GREEN
-            if (angle_left_knee >= 90 and angle_left_knee <= 120) and (angle_right_knee >= 90 and angle_right_knee <= 120) and (angle_left_hand <= 180 and angle_left_hand >= 150) and (angle_right_hand <= 180 and angle_right_hand >= 150):
+            if (angle_left_knee >= 90 and angle_left_knee <= 120) and (angle_right_knee >= 90 and angle_right_knee <= 120) and (angle_left_hand <= 180 and angle_left_hand >= 150) and (angle_right_hand <= 180 and angle_right_hand >= 150) and (angle_two_leg >= 90 and angle_two_leg <= 120):
                 cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (300, 360), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Angle: {:f}".format(angle_right_knee), (300, 410), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Hand Angle: {:f}".format(angle_right_hand), (300, 460), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Two Leg Angle: {:f}".format(angle_two_leg), (300, 510), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
 
             # YELLOW   
-            elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and ( ( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色
+            elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and ( ( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)) and  (angle_two_leg >= 60 and angle_two_leg < 90): # 黃色
                 cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (300, 360), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 255), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Angle: {:f}".format(angle_right_knee), (300, 410), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 255), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Hand Angle: {:f}".format(angle_right_hand), (300, 460), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 255), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Two Leg Angle: {:f}".format(angle_two_leg), (300, 510), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 0, 255), 1, cv2.LINE_AA)
 
             # RED
             else:
                 cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (300, 360), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 0, 255), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Angle: {:f}".format(angle_right_knee), (300, 410), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 0, 255), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Hand Angle: {:f}".format(angle_right_hand), (300, 460), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 0, 255), 1, cv2.LINE_AA)
+                cv2.putText(preview, "Two Leg Angle: {:f}".format(angle_two_leg), (300, 510), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 0, 255), 1, cv2.LINE_AA)
                 
 
         cv2.imshow('frame', preview)

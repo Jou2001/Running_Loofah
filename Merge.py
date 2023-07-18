@@ -24,12 +24,16 @@ RED = (248,141,110) # F88D6E
 # define screen size
 WIDTH = 960
 HEIGHT = 600
+# define player initial position
 PLAYER_Y = 270
-HEALTH = 100
-BAR_LENGTH = 200
-BAR_HEIGHT = 20
+#define player continuous jump time
 PLAYER_JUMP = 2
 gravity = 5
+# define player health
+HEALTH = 100
+# define health size
+BAR_LENGTH = 200
+BAR_HEIGHT = 20
 # define speed
 fps = 60 # 每秒60幀 
 # define time
@@ -44,12 +48,16 @@ background1_img = pygame.image.load(os.path.join("img", "background01.png")).con
 background2_img = pygame.image.load(os.path.join("img", "background02.png")).convert()
 takephoto = pygame.image.load(os.path.join("img", "takephoto.png")).convert_alpha()
 takephoto = pygame.transform.scale( takephoto, (WIDTH, HEIGHT) )
-fout_txt = os.path.join( "Handwriting.ttf" )
-
+button_start = pygame.image.load(os.path.join("img", "button_start.png")).convert_alpha()
+button_start = pygame.transform.scale( button_start, (200, 200) )
+startgame_word = pygame.image.load(os.path.join("img", "startgame_word.png")).convert_alpha()
+startgame_word = pygame.transform.scale( startgame_word, (WIDTH, HEIGHT) )
 load_image = []
 obstacle = []
 player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
 healthstate_head = pygame.image.load(os.path.join("img", "healthstate_head.png")).convert_alpha()
+# load into txt
+fout_txt = os.path.join( "Handwriting.ttf" )
 
 def draw_text( surf, text, size, x, y ) :
     font = pygame.font.Font( fout_txt, size )
@@ -59,9 +67,67 @@ def draw_text( surf, text, size, x, y ) :
     text_rect.top = y
     surf.blit( text_surface, text_rect )
 
+def draw_start() :
+    key_pressed = pygame.key.get_pressed()
+    screen.blit(background1_img, (0,0))
+    # screen.blit(startgame_word, (0,0))
+    # screen.blit(button_start, (380,300))
+    pygame.display.update()
+    waiting = True
+    init_time = 3
+    time = init_time
+    past = pygame.time.get_ticks()
+    while time != 0 :
+        timer.tick(fps)
+        time, past = times_1(time, past)
+        screen.blit(background1_img, (0,0))
+        txt_line = [ "在某一天，火星撞擊地球，", "一顆絲瓜因此長出手腳，", "開始奔跑起來，", "請協助絲瓜逃離變種生物的掌控，", "勇往直前吧!!", "In a cataclysmic event, Mars collided with Earth,", \
+                        "Transforming a loofah with hands and feet,", "It races frantically,", "Help the loofah escape mutant creatures,", "Go all out!"]
+        count_line = HEIGHT/10
+        plus = 20
+        txt_size = 20
+        draw_text( screen, "INTRODUCE", 50, WIDTH/2, count_line ) # 60
+        count_line = count_line + plus + 50
+        for txt in txt_line :
+            draw_text( screen, txt, txt_size, WIDTH/2, count_line ) 
+            count_line = count_line + plus + txt_size
+        
+        pygame.display.update()
+
+    init_time = 30
+    time = init_time
+    active = 1
+    while waiting :
+        timer.tick(fps)
+        time, past = times_1(time, past)
+        screen.blit(background1_img, (0,0))
+        if time >= init_time - 2 :
+            draw_text( screen, "PLEASE DO THE FOLLOWING", 50, WIDTH/2, HEIGHT/10 ) # 60
+        else :
+            waiting = False
+            # key_pressed = pygame.key.get_pressed()
+            # print( key_pressed[pygame.K_RIGHT] )
+            # if active == 1 :
+            #     draw_text( screen, "HOW TO JUMP", 50, WIDTH/2, HEIGHT/10 ) # 60
+            #     if key_pressed[pygame.K_RIGHT] :
+            #         print( "????????????" )
+            #         active += 1
+            # elif active == 2 :
+            #     draw_text( screen, "HOW TO SLIP", 50, WIDTH/2, HEIGHT/10 ) # 60
+            #     if key_pressed[pygame.K_UP] :
+            #         active += 1
+            # elif active == 3 :
+            #     draw_text( screen, "HOW TO ATTACK", 50, WIDTH/2, HEIGHT/10 ) # 60
+            #     if key_pressed[pygame.K_UP] :
+            #         active += 1
+            # else :
+            #     waiting = False
+        
+        pygame.display.update()
+
+    
 def draw_init() :
     global player_slip_img, healthstate_head
-
     screen.blit(background1_img, (0,0))
     draw_text( screen, 'running loofah', 65, WIDTH/2, HEIGHT/10 )
     draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
@@ -96,10 +162,29 @@ def draw_init() :
     player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
     healthstate_head = pygame.image.load(os.path.join("picture","player" , "HEALTHHEAD_1.png")).convert_alpha()
     healthstate_head = pygame.transform.scale( healthstate_head, (58, 53) )
-    for i in range( 2 ) :
+    for i in range( 3 ) :
       image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
       obstacle.append( image )
 
+def times_1(time, past) :
+    now = pygame.time.get_ticks()
+    if ( int(( now - past ) / 1000) == 1 ) :
+        past = now
+        time -= 1
+    return time, past
+
+def times_2(time, past, player) :
+    now = pygame.time.get_ticks()
+    if ( int(( now - past ) / 1000) == 1 ) :
+        past = now
+        time -= 1
+        player.count_jump()
+    
+    secs = time % 60
+    mins = int(time/60) % 60
+    hours = int(time/3600) % 24
+    draw_text( screen, f"{hours:02}:{mins:02}:{secs:02}", 20, WIDTH/2, BAR_HEIGHT )
+    return time, past
 
 class Player(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -160,13 +245,12 @@ class Player(pygame.sprite.Sprite) :
         if self.rect.y == PLAYER_Y and self.change_y < 0 :
             self.change_y = 0
 
-        print( "count: ", self.countJump, " change_y: ", self.change_y )
-
-            
+        # print( "count: ", self.countJump, " change_y: ", self.change_y ) 
 
 class Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
+        print("size: ", len(obstacle))
         self.image = obstacle[random.randrange(0,2)]
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(960,1200)
@@ -240,10 +324,13 @@ def run():
 
     show_init = True
     running = True
+    
+    draw_start()
+
     while running :
         # get input
         timer.tick(fps)
-
+        
         if show_init :
             draw_init()
             # init timer
@@ -284,53 +371,44 @@ def run():
             #frame = cv2.flip(frame, 1) #矩陣左右翻轉 
             #frame = cv2.resize(frame, (650, 500))
 
-
             # update game
             all_sprites.update()
             #screen.blit(frame, ( 0,0 ) )
             pygame.display.update()
             #cv2.imshow('frame', preview)
             
-        hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_circle) # 注意碰撞範圍
-        for hit in hits :
-            New_Obstacle(all_sprites, obstacles)
-            player.health -= hit.radius
-            if player.health <= 0 :
+            hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_circle) # 注意碰撞範圍
+            for hit in hits :
+                New_Obstacle(all_sprites, obstacles)
+                player.health -= hit.radius
+                if player.health <= 0 :
+                    show_init = True
+                    cap.release()
+                    cv2.destroyAllWindows()
+            # display
+            screen.blit(background2_img, (0,0))
+            all_sprites.draw(screen)
+            screen.blit(frame, ( 0, 500 ) )
+            draw_health(screen, player.health, 60, 32 )
+            screen.blit(healthstate_head, (10,10))
+            # timer
+            time, past = times_2(time, past, player)
+            if ( time == -1 ) :
                 show_init = True
-                cap.release()
-                cv2.destroyAllWindows()
-        # display
-        screen.blit(background2_img, (0,0))
-        all_sprites.draw(screen)
-        screen.blit(frame, ( 0, 500 ) )
-        draw_health(screen, player.health, 60, 32 )
-        screen.blit(healthstate_head, (10,10))
-        # timer
-        now = pygame.time.get_ticks()
-        # print( "now: ", now, " past: ", past, "now-past: ", ( now - past ) / 1000 )
-        if ( int(( now - past ) / 1000) == 1 ) :
-            past = now
-            time -= 1
-            player.count_jump()
-        
-        secs = time % 60
-        mins = int(time/60) % 60
-        hours = int(time/3600) % 24
-        draw_text( screen, f"{hours:02}:{mins:02}:{secs:02}", 20, WIDTH/2, BAR_HEIGHT )
-        if ( time == -1 ) :
-            show_init = True
 
-        player.key_pressed = pygame.key.get_pressed()
-        if player.mode == 1 :
-        #if player.key_pressed[pygame.K_UP] :
-            draw_text( screen, "Good!" + str( player.countJump ) + str( player.change_y ), 20, WIDTH/2, BAR_HEIGHT + 20 )
-        elif player.mode == 2 :
-        #elif player.key_pressed[pygame.K_RIGHT] :
-            draw_text( screen, "So so!" + str( player.countJump ) + str( player.change_y ), 20, WIDTH/2, BAR_HEIGHT + 20 )
-        else :
-            draw_text( screen, "Bad!" + str( player.countJump ) + str( player.change_y ), 20, WIDTH/2, BAR_HEIGHT + 20 )
+            # print( "now: ", now, " past: ", past, "now-past: ", ( now - past ) / 1000 )
 
-        pygame.display.update()
+            player.key_pressed = pygame.key.get_pressed()
+            if player.mode == 1 :
+            #if player.key_pressed[pygame.K_UP] :
+                draw_text( screen, "Good!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
+            elif player.mode == 2 :
+            #elif player.key_pressed[pygame.K_RIGHT] :
+                draw_text( screen, "So so!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
+            else :
+                draw_text( screen, "Bad!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
+
+            pygame.display.update()
 
     pygame.quit()
 

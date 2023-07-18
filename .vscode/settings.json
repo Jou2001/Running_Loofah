@@ -1,5 +1,6 @@
 {
     "editor.wordWrap": "wordWrapColumn",
-    "diffEditor.wordWrap": "off",
-    "editor.wordWrapColumn": 120
+    "diffEditor.wordWrap": "on",
+    "editor.wordWrapColumn": 120,
+    "python.defaultInterpreterPath": "/Users/yangtsaijou/opt/anaconda3/bin/python"
 }
