@@ -1,9 +1,8 @@
 from tempGame import New_Obstacle
 
-
-# 跳起（深蹲）：3秒（重複三次）obstacle1
-# 趴下（左右跨步蹲）：3秒（重複三次）obstacle3
-# 攻擊（後跨步蹲抬手）：3秒（重複三次）obstacle2
+# 跳起（深蹲）：3秒（重複三次）
+# 趴下（左右跨步蹲）：3秒（重複三次）
+# 攻擊（後跨步蹲抬手）：3秒（重複三次）
 # 休息三秒換下一個組合
 def Set1(time, all_sprites, obstacles):
     if time == 60 or time == 57 or time == 54 or time == 30 or time == 27 or time == 24:
