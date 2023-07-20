@@ -117,7 +117,6 @@ def draw_start() :
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if active == 1 and event.key == pygame.K_UP:
-                        print( "????????????" )
                         active += 1
                     elif active == 2 and event.key == pygame.K_UP:
                         active += 1
@@ -125,9 +124,7 @@ def draw_start() :
                         active += 1
                     
         pygame.display.update()
-
-
-    
+  
 def draw_init() :
     global player_slip_img, healthstate_head
     screen.blit(background1_img, (0,0))
@@ -264,7 +261,6 @@ class Obstacle(pygame.sprite.Sprite) :
         self.rect = self.image.get_rect()
         self.rect.x = 960
         self.rect.bottom = 500
-        
 
     def obstacle2(self):
         pygame.sprite.Sprite.__init__(self)
@@ -273,14 +269,12 @@ class Obstacle(pygame.sprite.Sprite) :
         self.rect.x = 960
         self.rect.bottom = 500
         
-
     def obstacle3(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = obstacle[2]
         self.rect = self.image.get_rect()
         self.rect.x = 960
-        self.rect.bottom = 500
-        
+        self.rect.bottom = 500   
        
     def change_obstacle(self) :
         self.randomtype = random.randrange(0,2)
@@ -401,15 +395,13 @@ def run():
 
             # Create obstacle
             functions = [(Set.Set1, time, all_sprites, obstacles), (Set.Set2, time, all_sprites, obstacles), (Set.Set3, time, all_sprites, obstacles), (Set.Set4, time, all_sprites, obstacles), (Set.Set5, time, all_sprites, obstacles)]
-            print("time: ", time, " past: ", past, " change:", changeTime)
+            
             if changeTime:
                 # 隨機選擇並調用一個函數
-                if time == 30 or time == 60 :
+                if time == 30 or time == 60:
                     func, time, all_sprites, obstacles = random.choice(functions)
-                
                 func(time, all_sprites, obstacles)
                 
-            
             # update game
             all_sprites.update()
             #screen.blit(frame, ( 0,0 ) )
