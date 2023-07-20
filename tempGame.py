@@ -7,7 +7,7 @@ import sys
 import cv2
 import RecognitionSquat
 import HeadPlusBody
-import Set1
+import Set
 import numpy as np
 
 # frame after state
@@ -288,9 +288,9 @@ class Obstacle(pygame.sprite.Sprite) :
 
     def update(self) :
         self.rect.x -= self.speed_X
-        if self.rect.right < 0 :
-            self.rect.x = 960
-            self.speed_X = 15
+        # if self.rect.right < 0 :
+        #     self.rect.x = 960
+        #     self.speed_X = 15
             # self.change_obstacle()
 
 class Ground1(pygame.sprite.Sprite) :
@@ -400,9 +400,15 @@ def run():
             #frame = cv2.resize(frame, (650, 500))
 
             # Create obstacle
+            functions = [(Set.Set1, time, all_sprites, obstacles), (Set.Set2, time, all_sprites, obstacles), (Set.Set3, time, all_sprites, obstacles), (Set.Set4, time, all_sprites, obstacles), (Set.Set5, time, all_sprites, obstacles)]
             print("time: ", time, " past: ", past, " change:", changeTime)
             if changeTime:
-                Set1.Run(time, all_sprites, obstacles)
+                # 隨機選擇並調用一個函數
+                if time == 30 or time == 60 :
+                    func, time, all_sprites, obstacles = random.choice(functions)
+                
+                func(time, all_sprites, obstacles)
+                
             
             # update game
             all_sprites.update()
