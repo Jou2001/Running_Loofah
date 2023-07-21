@@ -63,11 +63,10 @@ def putText(source, x, y, text, scale=2.5, color=(0,0,0)):
     cv2.putText(source, text, org, fontFace, fontScale, color, thickness, lineType)
 '''
 
-def main(screen, fps, timer):
-  cam = cv2.VideoCapture(0)
+def Photograph(screen, fps, timer, cam):
+
   a = 0 
-  sec = 0   
-  print( a, sec)
+  sec = 0
   if not cam.isOpened():
       print("Cannot open camera")
       exit()
@@ -128,7 +127,7 @@ def main(screen, fps, timer):
     for event in pygame.event.get() :
       if event.type == pygame.QUIT :
         pygame.quit()
-      elif event.type == pygame.KEYUP :
+      elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN :
         if a == 0 and sec == 0:
           a = 1
           sec = 4  # 加入倒數秒數
@@ -136,7 +135,7 @@ def main(screen, fps, timer):
     #cv2.imshow('takePicture', output)
 
 
-  cam.release()
+  #cam.release()
   pygame.display.update()
   
 
@@ -161,4 +160,4 @@ def main(screen, fps, timer):
   
 
 if __name__ == "__main__":
-   main()
+   Photograph()

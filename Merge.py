@@ -67,17 +67,17 @@ def draw_text( surf, text, size, x, y ) :
     text_rect.top = y
     surf.blit( text_surface, text_rect )
 
-def draw_start() :
+def draw_start(cap) :
     key_pressed = pygame.key.get_pressed()
     screen.blit(background1_img, (0,0))
     # screen.blit(startgame_word, (0,0))
     # screen.blit(button_start, (380,300))
     pygame.display.update()
     waiting = True
-    init_time = 3
-    time = init_time
+    time = 0
     past = pygame.time.get_ticks()
-    while time != 0 :
+
+    while time != 3 :
         timer.tick(fps)
         time, past = times_1(time, past)
         screen.blit(background1_img, (0,0))
@@ -91,68 +91,70 @@ def draw_start() :
         for txt in txt_line :
             draw_text( screen, txt, txt_size, WIDTH/2, count_line ) 
             count_line = count_line + plus + txt_size
-        
+
+        for event in pygame.event.get() :
+          if event.type == pygame.QUIT :
+            pygame.quit()
+
         pygame.display.update()
 
-    init_time = 30
-    time = init_time
+    time = 0
     active = 1
     while waiting :
+        ret, img = cap.read()
+        if not ret:
+          print("Cannot receive frame")
+          exit()
+      
         timer.tick(fps)
         time, past = times_1(time, past)
         screen.blit(background1_img, (0,0))
-        if time >= init_time - 2 :
+        if time <= 2 :
             draw_text( screen, "PLEASE DO THE FOLLOWING", 50, WIDTH/2, HEIGHT/10 ) # 60
         else :
-            waiting = False
-            # key_pressed = pygame.key.get_pressed()
-            # print( key_pressed[pygame.K_RIGHT] )
-            # if active == 1 :
-            #     draw_text( screen, "HOW TO JUMP", 50, WIDTH/2, HEIGHT/10 ) # 60
-            #     if key_pressed[pygame.K_RIGHT] :
-            #         print( "????????????" )
-            #         active += 1
-            # elif active == 2 :
-            #     draw_text( screen, "HOW TO SLIP", 50, WIDTH/2, HEIGHT/10 ) # 60
-            #     if key_pressed[pygame.K_UP] :
-            #         active += 1
-            # elif active == 3 :
-            #     draw_text( screen, "HOW TO ATTACK", 50, WIDTH/2, HEIGHT/10 ) # 60
-            #     if key_pressed[pygame.K_UP] :
-            #         active += 1
-            # else :
-            #     waiting = False
-        
-        pygame.display.update()
+            key_pressed = pygame.key.get_pressed()
+            print( key_pressed[pygame.K_RIGHT] )
+            if active == 1 :
+                draw_text( screen, "HOW TO JUMP", 50, WIDTH/2, HEIGHT/10 ) # 60
+            elif active == 2 :
+                draw_text( screen, "HOW TO SLIP", 50, WIDTH/2, HEIGHT/10 ) # 60
+            elif active == 3 :
+                draw_text( screen, "HOW TO ATTACK", 50, WIDTH/2, HEIGHT/10 ) # 60
+            else :
+                waiting = False
 
+            for event in pygame.event.get() :
+                if event.type == pygame.QUIT :
+                  pygame.quit()
+                if event.type == pygame.KEYDOWN :
+                    if event.key == pygame.K_UP :
+                        active += 1
+
+        img = cv2.resize(img,(int(img.shape[1]*0.6),int(img.shape[0]*0.6)))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = np.rot90(img)
+        img = pygame.surfarray.make_surface(img)
+        screen.blit(img, ( 450, 200 ) )
+        pygame.display.update()
     
-def draw_init() :
+
+def draw_init(cap) :
     global player_slip_img, healthstate_head
     screen.blit(background1_img, (0,0))
     draw_text( screen, 'running loofah', 65, WIDTH/2, HEIGHT/10 )
     draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
     pygame.display.update()
-    faceOK = HeadPlusBody.main( screen, fps, timer ) 
-    waiting = True
-    while waiting :
-      timer.tick(fps)
-      for event in pygame.event.get() :
-          if event.type == pygame.QUIT :
-            pygame.quit()
-          elif faceOK :
-            waiting = False
+    faceOK = HeadPlusBody.Photograph( screen, fps, timer, cap ) 
 
-    screen.blit(background1_img, (0,0))
-    draw_text( screen, 'squat to jump', 30, WIDTH/2, HEIGHT/2 )
-    pygame.display.update()
-    waiting = True
-    while waiting :
-      timer.tick(fps)
-      for event in pygame.event.get() :
-        if event.type == pygame.QUIT :
-          pygame.quit()
-        elif event.type == pygame.KEYUP :
-          waiting = False
+    time = 0
+    past = pygame.time.get_ticks()
+    while time < 3 :
+        timer.tick(fps)
+        time, past = times_1(time, past) 
+        screen.blit(background1_img, (0,0))
+        draw_text( screen, str(3 - time), 120, WIDTH/2, HEIGHT/2-100 )
+        pygame.display.update()
+
 
     for i in range( 16 ) :
       image = pygame.image.load(os.path.join("picture", "player" , "RUN_" + str(i+1) + ".png")).convert_alpha()
@@ -170,7 +172,7 @@ def times_1(time, past) :
     now = pygame.time.get_ticks()
     if ( int(( now - past ) / 1000) == 1 ) :
         past = now
-        time -= 1
+        time += 1
     return time, past
 
 def times_2(time, past, player) :
@@ -220,7 +222,7 @@ class Player(pygame.sprite.Sprite) :
         
         if self.mode == 1 and self.change_y == 0 and self.countJump >= 0 :
         # if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]
-           print( "pressed\n" )
+           #print( "pressed\n" )
            self.change_y = 60
            self.countJump = PLAYER_JUMP
 
@@ -245,12 +247,10 @@ class Player(pygame.sprite.Sprite) :
         if self.rect.y == PLAYER_Y and self.change_y < 0 :
             self.change_y = 0
 
-        # print( "count: ", self.countJump, " change_y: ", self.change_y ) 
 
 class Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
-        print("size: ", len(obstacle))
         self.image = obstacle[random.randrange(0,2)]
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(960,1200)
@@ -324,21 +324,28 @@ def run():
 
     show_init = True
     running = True
-    
-    draw_start()
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Cannot open camera")
+        exit()
 
-    while running :
+    draw_start(cap)
+
+    while running :       
         # get input
         timer.tick(fps)
         
         if show_init :
-            draw_init()
+            # open camera
+            if not cap.isOpened():
+                cap = cv2.VideoCapture(0) 
+
+            draw_init(cap)
             # init timer
             time = 200
             now = pygame.time.get_ticks()
             past = now
-            # open camera
-            cap = cv2.VideoCapture(0)
+
 
             show_init = False
             all_sprites = pygame.sprite.Group()
