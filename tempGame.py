@@ -282,25 +282,6 @@ class Attack_Obstacle(pygame.sprite.Sprite) :
     def update(self) :
         self.rect.x -= self.speed_X
 
-class Attack_Obstacle(pygame.sprite.Sprite) :
-    def __init__(self) :
-        for i in range( 3 ) :
-            image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
-            if i+1 == 3:
-                image = pygame.transform.scale( image, (300, 300) )
-            obstacle.append( image )
-        pygame.sprite.Sprite.__init__(self)
-        self.speed_X = 15
-        self.radius = 10
-        self.image = obstacle[1]
-        self.rect = self.image.get_rect()
-        self.rect.x = 960
-        self.rect.bottom = 500
-        self.energy = 10  
-
-    def update(self) :
-        self.rect.x -= self.speed_X
-
 class Slide_Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
         for i in range( 3 ) :
