@@ -8,6 +8,7 @@ import cv2
 import RecognitionSquat
 import HeadPlusBody
 import numpy as np
+import Set
 
 # frame after state
 preview = []
@@ -137,7 +138,6 @@ def draw_start(cap) :
         screen.blit(img, ( 450, 200 ) )
         pygame.display.update()
     
-
 def draw_init(cap) :
     global player_slip_img, healthstate_head
     screen.blit(background1_img, (0,0))
@@ -164,9 +164,6 @@ def draw_init(cap) :
     player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
     healthstate_head = pygame.image.load(os.path.join("picture","player" , "HEALTHHEAD_1.png")).convert_alpha()
     healthstate_head = pygame.transform.scale( healthstate_head, (58, 53) )
-    for i in range( 3 ) :
-      image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
-      obstacle.append( image )
 
 def times_1(time, past) :
     now = pygame.time.get_ticks()
@@ -220,8 +217,8 @@ class Player(pygame.sprite.Sprite) :
         key_pressed = pygame.key.get_pressed()
         self.change_post()
         
-        if self.mode == 1 and self.change_y == 0 and self.countJump >= 0 :
-        # if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]
+        # if self.mode == 1 and self.change_y == 0 and self.countJump >= 0 :
+        if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]
            #print( "pressed\n" )
            self.change_y = 60
            self.countJump = PLAYER_JUMP
@@ -247,28 +244,81 @@ class Player(pygame.sprite.Sprite) :
         if self.rect.y == PLAYER_Y and self.change_y < 0 :
             self.change_y = 0
 
-
-class Obstacle(pygame.sprite.Sprite) :
+class Jump_Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
+        for i in range( 3 ) :
+            image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+            if i+1 == 3:
+                image = pygame.transform.scale( image, (300, 300) )
+            obstacle.append( image )
         pygame.sprite.Sprite.__init__(self)
-        self.image = obstacle[random.randrange(0,2)]
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(960,1200)
-        self.rect.bottom = 500
-        self.speed_X = 10
+        self.speed_X = 15
         self.radius = 10
-        self.randomtype = random.randrange(0,2)
-       
-    def change_obstacle(self) :
-        self.randomtype = random.randrange(0,2)
-        self.image = obstacle[self.randomtype]
+        self.image = obstacle[0]
+        self.rect = self.image.get_rect()
+        self.rect.x = 960
+        self.rect.bottom = 500
+        self.energy = 10
 
     def update(self) :
         self.rect.x -= self.speed_X
-        if self.rect.right < 0 :
-            self.rect.x = random.randrange(960,1200)
-            self.speed_X = 10
-            self.change_obstacle()
+
+class Attack_Obstacle(pygame.sprite.Sprite) :
+    def __init__(self) :
+        for i in range( 3 ) :
+            image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+            if i+1 == 3:
+                image = pygame.transform.scale( image, (300, 300) )
+            obstacle.append( image )
+        pygame.sprite.Sprite.__init__(self)
+        self.speed_X = 15
+        self.radius = 10
+        self.image = obstacle[1]
+        self.rect = self.image.get_rect()
+        self.rect.x = 960
+        self.rect.bottom = 500
+        self.energy = 10
+
+    def update(self) :
+        self.rect.x -= self.speed_X
+
+class Attack_Obstacle(pygame.sprite.Sprite) :
+    def __init__(self) :
+        for i in range( 3 ) :
+            image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+            if i+1 == 3:
+                image = pygame.transform.scale( image, (300, 300) )
+            obstacle.append( image )
+        pygame.sprite.Sprite.__init__(self)
+        self.speed_X = 15
+        self.radius = 10
+        self.image = obstacle[1]
+        self.rect = self.image.get_rect()
+        self.rect.x = 960
+        self.rect.bottom = 500
+        self.energy = 10  
+
+    def update(self) :
+        self.rect.x -= self.speed_X
+
+class Slide_Obstacle(pygame.sprite.Sprite) :
+    def __init__(self) :
+        for i in range( 3 ) :
+            image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+            if i+1 == 3:
+                image = pygame.transform.scale( image, (300, 300) )
+            obstacle.append( image )
+        pygame.sprite.Sprite.__init__(self)
+        self.speed_X = 15
+        self.radius = 80
+        self.image = obstacle[2]
+        self.rect = self.image.get_rect()
+        self.rect.x = 960
+        self.rect.bottom = 350
+        self.energy = 15
+
+    def update(self) :
+        self.rect.x -= self.speed_X
 
 class Ground1(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -298,10 +348,20 @@ class Ground2(pygame.sprite.Sprite) :
         if self.rect.right < 0 :
             self.rect.x = WIDTH - 10
 
-def New_Obstacle(all_sprites, obstacles) :
-    o = Obstacle()
+def New_JumpObstacle(all_sprites, obstacles) :
+    o = Jump_Obstacle()
     all_sprites.add(o)
-    obstacles.add(o)    
+    obstacles.add(o) 
+
+def New_AttackObstacle(all_sprites, obstacles) :
+    o = Attack_Obstacle()
+    all_sprites.add(o)
+    obstacles.add(o)
+
+def New_SlideObstacle(all_sprites, obstacles) :
+    o = Slide_Obstacle()
+    all_sprites.add(o)
+    obstacles.add(o)   
 
 def draw_health(surf, hp, x, y ):
     if hp < 0:
@@ -324,6 +384,9 @@ def run():
 
     show_init = True
     running = True
+    changeTime = True
+    pretime = 60
+
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Cannot open camera")
@@ -342,7 +405,7 @@ def run():
 
             draw_init(cap)
             # init timer
-            time = 200
+            time = 60
             now = pygame.time.get_ticks()
             past = now
 
@@ -357,9 +420,6 @@ def run():
             all_sprites.add(ground2)
             player = Player()
             all_sprites.add(player)
-
-            for i in range(3) :
-                New_Obstacle(all_sprites, obstacles)
 
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
@@ -378,6 +438,15 @@ def run():
             #frame = cv2.flip(frame, 1) #矩陣左右翻轉 
             #frame = cv2.resize(frame, (650, 500))
 
+            # Create obstacle
+            functions = [(Set.Set1), (Set.Set2), (Set.Set3), (Set.Set4), (Set.Set5)]
+            
+            if changeTime:
+                # 隨機選擇並調用一個函數
+                if time % 30 == 0:
+                    func = random.choice(functions)
+                func(time, all_sprites, obstacles)
+
             # update game
             all_sprites.update()
             #screen.blit(frame, ( 0,0 ) )
@@ -386,8 +455,7 @@ def run():
             
             hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_circle) # 注意碰撞範圍
             for hit in hits :
-                New_Obstacle(all_sprites, obstacles)
-                player.health -= hit.radius
+                player.health -= hit.energy
                 if player.health <= 0 :
                     show_init = True
                     cap.release()
@@ -400,6 +468,13 @@ def run():
             screen.blit(healthstate_head, (10,10))
             # timer
             time, past = times_2(time, past, player)
+
+            if time != pretime:
+                pretime = time
+                changeTime = True
+            else:
+                changeTime = False
+
             if ( time == -1 ) :
                 show_init = True
 
