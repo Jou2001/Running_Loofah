@@ -1,7 +1,6 @@
 import cv2
 import mediapipe as mp
 import numpy as np
-import Merge
 
 # cam = cv2.VideoCapture(0)
 mp_drawing = mp.solutions.drawing_utils
@@ -14,7 +13,6 @@ def angle_between_points(a, b, c):
     ba = np.array([a.x - b.x, a.y - b.y, a.z - b.z])
     bc = np.array([c.x - b.x, c.y - b.y, c.z - b.z])
     
-
     dot = np.dot(ba, bc) # 內積(distance_ba * distance_bc * cos0)
     distance_ba = np.linalg.norm(ba)
     distance_bc = np.linalg.norm(bc)
@@ -58,9 +56,6 @@ def main(preview):
             #             )
         else: # 紅色 
             return 3
-
-
-
 
 if __name__ == '__main__':
     main()
