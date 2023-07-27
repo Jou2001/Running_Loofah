@@ -46,7 +46,7 @@ def Set3(time, all_sprites, obstacles):
 # 趴下（左右跨步蹲）：3秒（重複三次）
 def Set4(time, all_sprites, obstacles):
     now = time % 30
-    if now == 30 or now == 28 or now == 26:
+    if now == 0 or now == 28 or now == 26:
         New_AttackObstacle(all_sprites, obstacles)
     elif now == 24 or now == 22 or now == 20:
         New_SlideObstacle(all_sprites, obstacles)
