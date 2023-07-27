@@ -5,11 +5,15 @@ from PIL import Image
 import pygame
 import Merge
 
+pygame.mixer.init()
+#load music mp3
+camera_mp3 = pygame.mixer.Sound(os.path.join("mp3", "cameraMusic.mp3"))
+
 path_input = "./picture"
-path_output_RUN = "./picture/player/RUN_"
-path_output_HeathHead = "./picture/player/HEALTHHEAD_"
 WIDTH = 960
 HEIGHT = 600
+
+
 
 def CompositePicture(input_head, input_body, path_output, index, minify):
   if os.path.isfile(input_head) and os.path.isfile(input_body):
@@ -120,7 +124,7 @@ def Photograph(screen, fps, timer, cam):
     Merge.draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
     if str(int(sec)) != "0" :
       Merge.draw_text( screen, str(int(sec)), 200, WIDTH/2, HEIGHT/5 )   
-       
+
     pygame.display.update()
     
     timer.tick(fps)
@@ -131,18 +135,21 @@ def Photograph(screen, fps, timer, cam):
         if a == 0 and sec == 0:
           a = 1
           sec = 4  # 加入倒數秒數
+          
       
-    #cv2.imshow('takePicture', output)
 
-
+  pygame.mixer.music.fadeout(4)
+  camera_mp3.play()
   #cam.release()
   pygame.display.update()
   
-
   # 裁切成圓型   
   head = imge_cut_Circle(path_input  + '/head_body/head.jpg')
-  # 合成圖片
+
+
+  # run
   RunArr = []
+  path_output_RUN = "./picture/player/RUN_"
   for i in range(16):
     RunArr.append('./img/player'+ str(i+1) + '.png' )
   minify = [0.75, 90, 40]
@@ -153,9 +160,19 @@ def Photograph(screen, fps, timer, cam):
   #healthState_head 
   minify = [0.6, 40, 50]
   img_HeathHead = "./img/healthstate_head.png"
-  if ( not CompositePicture(head,  img_HeathHead, path_output_HeathHead, 1, minify )  ):
+  path_output_HeathHead = "./picture/player/HEALTHHEAD_"
+  if ( not CompositePicture(head,  img_HeathHead, path_output_HeathHead, 1, minify ) ):
       return False
   
+  # slip
+  img_slip = "./img/player_slip.png" 
+  img_slip_output = "./picture/player/player_slip_" 
+  minify = [0.75, 80, 40]
+  if ( not CompositePicture(head,  img_slip, img_slip_output, 1, minify ) ) :
+     return False
+
+
+
   return True 
   
 
