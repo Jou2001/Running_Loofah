@@ -18,9 +18,10 @@ def get_mid_point(a, b):
     mid.x = (a.x + b.x) / 2
     mid.y = (a.y + b.y) / 2
     mid.z = (a.z + b.z) / 2
+    print("a: ", a)
+    print("b: ", b)
+    print("mid: ", mid)
     return mid
-
-
 
 def get_vector(a, b, c):
     ba = np.array([a.x - b.x, a.y - b.y, a.z - b.z])
@@ -89,15 +90,15 @@ def main():
 
             # Use angle_left_leg and angle_right_leg in your logic instead of angle_left_leg and angle_right_leg
             # GREEN
-            if (angle_left_leg >= 15 and angle_left_leg <= 20) and (angle_right_leg >= 15 and angle_right_leg <= 20) and  (angle_two_leg >= 50 and angle_two_leg <= 120): 
-                #(angle_left_hand <= 180 and angle_left_hand >= 150) and (angle_right_hand <= 180 and angle_right_hand >= 150) and
+            if (angle_left_leg >= 15 and angle_left_leg <= 20) and (angle_right_leg >= 15 and angle_right_leg <= 20) and  (angle_two_leg >= 50 and angle_two_leg <= 120) and (angle_left_hand <= 180 and angle_left_hand >= 150) and (angle_right_hand <= 180 and angle_right_hand >= 150): 
+                
                 cv2.putText(preview, "Left Angle: {:f}".format(angle_left_leg), (300, 360), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Angle: {:f}".format(angle_right_leg), (300, 410), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Hand Angle: {:f}".format(angle_right_hand), (300, 460), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Two Leg Angle: {:f}".format(angle_two_leg), (300, 510), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 0), 1, cv2.LINE_AA)
 
             # YELLOW   
-            elif (( angle_left_leg >= 80 and angle_left_leg <= 90 ) or (angle_left_leg > 120 and angle_left_leg < 130)) and ( ( angle_right_leg >= 80 and angle_right_leg <= 90 ) or (angle_right_leg > 120 and angle_right_leg < 130)) and  (angle_two_leg >= 60 and angle_two_leg < 90) and is_lunge_step: # 黃色
+            elif (( angle_left_leg >= 80 and angle_left_leg <= 90 ) or (angle_left_leg > 120 and angle_left_leg < 130)) and ( ( angle_right_leg >= 80 and angle_right_leg <= 90 ) or (angle_right_leg > 120 and angle_right_leg < 130)) and  (angle_two_leg >= 60 and angle_two_leg < 90) : # 黃色
                 cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_leg), (300, 360), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 255), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Angle: {:f}".format(angle_right_leg), (300, 410), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 255), 1, cv2.LINE_AA)
                 cv2.putText(preview, "Right Hand Angle: {:f}".format(angle_right_hand), (300, 460), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 255, 255), 1, cv2.LINE_AA)
