@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import pygame
 import Merge
+import RecongnitionNext
 
 pygame.mixer.init()
 #load music mp3
@@ -95,6 +96,7 @@ def Photograph(screen, fps, timer, cam):
     x1, y1, x2, y2 = [int(w*0.5)+120, int(h*0.5)+120, int(w*0.5)-120, int(h*0.5)-120 ]
 
 
+    mode_next = RecongnitionNext.main(cam)
     if a == 0:
         output = img.copy()
     else:
@@ -131,12 +133,15 @@ def Photograph(screen, fps, timer, cam):
     for event in pygame.event.get() :
       if event.type == pygame.QUIT :
         pygame.quit()
-      elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN :
-        if a == 0 and sec == 0:
-          a = 1
-          sec = 4  # 加入倒數秒數
+      #elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN :
+      #  if a == 0 and sec == 0:
+      #    a = 1
+      #    sec = 4  # 加入倒數秒數
           
-      
+    if mode_next == 1 :
+      if a == 0 and sec == 0:
+        a = 1
+        sec = 4  # 加入倒數秒數      
 
   pygame.mixer.music.fadeout(4)
   camera_mp3.play()

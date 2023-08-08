@@ -2,13 +2,13 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import Merge
+import pygame
 
 # cam = cv2.VideoCapture(0)
-mp_drawing = mp.solutions.drawing_utils
+# mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
-status = False
-
 pose = mp_pose.Pose()
+
 
 def angle_between_points(a, b, c):
     ba = np.array([a.x - b.x, a.y - b.y, a.z - b.z])
@@ -25,17 +25,18 @@ def angle_between_points(a, b, c):
     return angel_deg
 
 def main(cap):
-    global status
-    flag = False
-
     ret, frame = cap.read()
-    preview = frame.copy()
-    
+
+    if not ret:
+      print("Read Error")
+      exit()  
+
+    preview = frame.copy()   
     rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
     results = pose.process(rgbframe) # 從影像增測姿勢    
 
     if results.pose_world_landmarks:
-        # mp_drawing.draw_landmarks(preview, results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
+        # mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
         # 获取关键点坐标
         hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
         hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
@@ -48,21 +49,21 @@ def main(cap):
         angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
         angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
 
+        print( knee_left.visibility )    
         # 左腳
         if (angle_left_knee >= 90 and angle_left_knee <= 120) and (angle_right_knee >= 90 and angle_right_knee <= 120): # 綠色 標準動作
             return 1
             # cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360)
             #             , cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
             #             )
-        elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and ( ( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色
+        elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and \
+             (( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色
             return 2
             # cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360)
             #             , cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA
             #             )
         else: # 紅色 
             return 3
-
-
 
 
 if __name__ == '__main__':

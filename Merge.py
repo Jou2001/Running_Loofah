@@ -7,11 +7,23 @@ import sys
 import cv2
 import RecognitionSquat
 import RecognitionSquatDown
+import RecognitionAttack
+import RecongnitionNext
 import HeadPlusBody
 import numpy as np
 import Set
 from moviepy.editor import *
+import mediapipe as mp
 
+
+mp_drawing = mp.solutions.drawing_utils
+mp_pose = mp.solutions.pose
+
+pose = mp_pose.Pose()
+
+all_sprites = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
+attackObstacles = pygame.sprite.Group()
 
 cap = []
 # initial
@@ -34,6 +46,7 @@ PLAYER_Y = 270
 #define player continuous jump time
 PLAYER_JUMP = 2
 PLAYER_DOWN = 2
+PLAYER_ATTACK = 2
 gravity = 5
 # define player health
 HEALTH = 100
@@ -69,6 +82,8 @@ intro_slip_1 = pygame.transform.scale( intro_slip_1, (280, 300) )
 intro_slip_2 = pygame.image.load(os.path.join("img", "intro_slip_2.png")).convert_alpha()
 intro_slip_2 = pygame.transform.scale( intro_slip_2, (280, 300) )
 
+bullet = pygame.image.load(os.path.join("img", "bullet.png")).convert_alpha()
+bullet = pygame.transform.scale( bullet, (50, 57) )
 #load mp4
 do_the_following_mp4 = os.path.join("video", "do_the_following.mp4")
 start321_mp4 = os.path.join("video", "start321_mp3.mp4")
@@ -152,31 +167,14 @@ def draw_start() :
         pygame.display.update()
 
     ReadVideo(do_the_following_mp4, "PLEASE DO THE FOLLOWING", 50)
-    '''
-    video = cv2.VideoCapture(do_the_following_mp4)
-    video_fps = video.get(cv2.CAP_PROP_FPS)
-    while True :
-        timer.tick(video_fps)
-        ret, frame = video.read()
-        if ret == True :
-            frame = cv2.resize(frame,(960,600))
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = np.rot90(frame, -1)
-            frame = pygame.surfarray.make_surface(frame)
-            frame = pygame.transform.flip(frame, False, True)
-            screen.blit(frame, ( 0, 0 ) ) 
-            for event in pygame.event.get() :
-                if event.type == pygame.QUIT :
-                    pygame.quit()
-            draw_text( screen, "PLEASE DO THE FOLLOWING", 50, WIDTH/2, HEIGHT/10 ) # 60
-            pygame.display.flip()
-        else : 
-            break
-    '''
-
+   
     active = 1
     waiting = True
     while waiting :
+        mode_jump = RecognitionSquat.main(cap)
+        mode_down = RecognitionSquatDown.main(cap)
+        mode_attack = RecognitionAttack.main(cap)
+        mode_next = RecongnitionNext.main(cap)
         ret, img = cap.read()
         if not ret:
           print("Cannot receive frame")
@@ -203,16 +201,54 @@ def draw_start() :
         for event in pygame.event.get() :
             if event.type == pygame.QUIT :
                 pygame.quit()
-            if event.type == pygame.KEYDOWN :
-                if event.key == pygame.K_UP :
-                    active += 1
+            # if event.type == pygame.KEYDOWN :
+            #    if event.key == pygame.K_UP :
+            #        active += 1
+        preview = img.copy() 
+        # img = cv2.resize(img,(int(img.shape[1]*0.6),int(img.shape[0]*0.6)))
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # img = np.rot90(img)
+        # img = pygame.surfarray.make_surface(img)
+        # screen.blit(img, ( 450, 200 ) )
 
-        img = cv2.resize(img,(int(img.shape[1]*0.6),int(img.shape[0]*0.6)))
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = np.rot90(img)
-        img = pygame.surfarray.make_surface(img)
-        screen.blit(img, ( 450, 200 ) )
-        pygame.display.update()
+        
+        rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+        
+        results = pose.process(rgbframe) # 從影像增測姿勢  
+
+        mp_drawing.draw_landmarks(preview, results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
+        mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+        
+        cv2.imshow( "AAAA", cv2.flip(preview, 1))       
+        preview = cv2.resize(preview,(int(preview.shape[1]*0.6),int(preview.shape[0]*0.6)))
+
+        
+        preview = np.rot90(preview)   
+        preview = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+        preview = pygame.surfarray.make_surface(preview)
+        screen.blit(preview, ( 450, 200 ) )
+
+
+
+        if mode_jump == 1 and active == 1 :
+            active += 1
+            draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
+            pygame.display.update()
+            pygame.time.wait(500) 
+        elif mode_down == 1 and active == 2 :
+            active += 1
+            draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 ) 
+            pygame.display.update()
+            pygame.time.wait(500) 
+        elif mode_attack == 1 and active == 3 :
+            active += 1
+            draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
+            pygame.display.update()
+            pygame.time.wait(500) 
+        else :
+            draw_text( screen, "Bad!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
+            pygame.display.update()
+        
     
 def draw_init() :
     global player_slip_img, healthstate_head, cap
@@ -223,7 +259,6 @@ def draw_init() :
     faceOK = HeadPlusBody.Photograph( screen, fps, timer, cap ) 
 
 
-    #ReadVideo(start321_mp4, "", 0)
     VideoFileClip(start321_mp4).preview()
 
 
@@ -262,7 +297,7 @@ def times_2(time, past, player) :
     return time, past
 
 class Player(pygame.sprite.Sprite) :
-    global cap, jump_mp3
+    global cap, jump_mp3, all_sprites
 
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
@@ -277,18 +312,22 @@ class Player(pygame.sprite.Sprite) :
         self.health = HEALTH
         self.countJump = PLAYER_JUMP 
         self.countdown = PLAYER_DOWN
+        self.countattack = PLAYER_ATTACK
         self.mode_jump = 0
         self.mode_down = 0
+        self.mode_attack = 0
         self.key_pressed = 0
         
 
     def update(self) :
         self.mode_jump = RecognitionSquat.main(cap)
         self.mode_down = RecognitionSquatDown.main(cap)
+        self.mode_attack = RecognitionAttack.main(cap)
         self.change_post()
         
         self.jump()
         self.down()
+        self.shoot()
  
     def change_post(self) :
         self.run_time += 1
@@ -303,7 +342,7 @@ class Player(pygame.sprite.Sprite) :
 
     def jump(self):  
         key_pressed = pygame.key.get_pressed() 
-        # if self.mode_jump == 1 and self.change_y == 0 and self.countJump >= 0 :
+        #if self.mode_jump == 1 and self.change_y == 0 and self.countJump >= 0 :
         if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]    
             if self.rect.y == PLAYER_Y :
               jump_mp3.play()   
@@ -311,7 +350,7 @@ class Player(pygame.sprite.Sprite) :
             self.change_y = 60
             self.countJump = PLAYER_JUMP
 
-        if self.change_y > 0 or self.rect.y < PLAYER_Y :
+        elif self.change_y > 0 or self.rect.y < PLAYER_Y :
             self.rect.y -= self.change_y
             self.change_y -= gravity
             #if self.countJump > 0 and self.change_y < 0 and self.mode_jump != 3 :
@@ -339,24 +378,55 @@ class Player(pygame.sprite.Sprite) :
 
     def down(self):       
         key_pressed = pygame.key.get_pressed()
-        # if self.mode_down == 1 and self.change_y == 0 and self.countdown >= 0 :
+        #if self.mode_down == 1 and self.change_y == 0 and self.countdown >= 0 :
         if key_pressed[pygame.K_DOWN] and self.countdown >= 0 : # key_pressed[pygame.K_RIGHT]
             self.countdown = PLAYER_DOWN
             self.image = player_slip_img     
             self.rect.y = PLAYER_Y + 85
 
-        # if self.countdown > 0 and self.mode_down != 3 :
-        if self.countdown > 0 and ( key_pressed[pygame.K_DOWN] or key_pressed[pygame.K_LEFT] ) :
+        #elif self.countdown > 0 and self.mode_down != 3 :
+        elif self.countdown > 0 and ( key_pressed[pygame.K_DOWN] or key_pressed[pygame.K_LEFT] ) :
             self.image = player_slip_img 
             self.rect.y = PLAYER_Y + 85
             
-        #if self.countdown > 0 and self.mode_down == 3 :
-        if self.countdown > 0 and ( not key_pressed[pygame.K_DOWN] and not key_pressed[pygame.K_LEFT] ) :
+        #elif self.countdown > 0 and self.mode_down == 3 :
+        elif self.countdown > 0 and ( not key_pressed[pygame.K_DOWN] and not key_pressed[pygame.K_LEFT] ) :
             self.countdown = 0
             self.image = load_image[0]
             self.run_time = 0 
             self.rect.y = PLAYER_Y
-        
+
+    def shoot(self) :
+        key_pressed = pygame.key.get_pressed()
+        #if self.mode_attack == 1 and self.countattack >= 0 :
+        if ( key_pressed[pygame.K_LEFT] ) :
+            bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+10))
+            all_sprites.add(bullet)
+            bullets.add(bullet)
+            self.countattack = PLAYER_ATTACK
+            
+        #elif self.countattack > 0 and self.mode_attack != 3 :
+        elif self.countattack > 0 and ( key_pressed[pygame.K_LEFT] ) :
+            self.countattack -= 1
+            bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+10))
+            all_sprites.add(bullet)
+            bullets.add(bullet)
+
+class Bullet(pygame.sprite.Sprite) :
+    def __init__(self, x, y) :
+        pygame.sprite.Sprite.__init__(self)
+        self.image = bullet
+        self.rect = self.image.get_rect()
+        self.rect.centerx = x
+        self.rect.bottom = y
+        self.radius = 23
+        self.speedx = 50    
+
+    def update(self) :
+        self.rect.x += self.speedx
+        if self.rect.left >= WIDTH:
+            self.kill()
+
 class Ground1(pygame.sprite.Sprite) :
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
@@ -403,7 +473,7 @@ def draw_health(surf, hp, x, y ):
 
 
 def run():
-    global cap
+    global cap, all_sprites, attackObstacles
 
     show_init = True
     running = True
@@ -428,7 +498,6 @@ def run():
                   pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
                   pygame.mixer_music.set_volume(0.5)
                   pygame.mixer_music.play(-1)
-
 
               draw_init()
               # init timer
@@ -455,34 +524,45 @@ def run():
 
           ret, frame = cap.read()
 
+          if not ret:
+            print("Read Error")
+            exit()     
+          else :
+              preview = frame.copy()
+              #frame = cv2.resize(frame, (150, 100))
+              #frame = np.rot90(frame)
+              #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+              #frame = pygame.surfarray.make_surface(frame) 
 
-          if ret:
-              frame = cv2.resize(frame, (150, 100))
-              frame = np.rot90(frame)
-              frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-              frame = pygame.surfarray.make_surface(frame)
-              #frame = cv2.flip(frame, 1) #矩陣左右翻轉 
-              #frame = cv2.resize(frame, (650, 500))
+              rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+              results = pose.process(rgbframe) # 從影像增測姿勢  
+              mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+              preview = cv2.resize(preview, (150, 100))
+              preview = np.rot90(preview)
+              preview = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+              preview = pygame.surfarray.make_surface(preview) 
 
               # Create obstacle
               functions = [(Set.Set1), (Set.Set2), (Set.Set3), (Set.Set4), (Set.Set5)]
               
               if changeTime:
                   # 隨機選擇並調用一個函數
-                  if time % 30 == 0:
-                      func = random.choice(functions)
-                  func(time, all_sprites, obstacles)
+                  # if time % 30 == 0:
+                      # func = random.choice(functions)
+                  # func(time, all_sprites, obstacles)
+                  Set.Set1(time, all_sprites, obstacles, attackObstacles)
 
               # update game
               all_sprites.update()
-              #screen.blit(frame, ( 0,0 ) )
               pygame.display.update()
-              #cv2.imshow('frame', preview)
+
               
+             
               # display
               screen.blit(background2_img, (0,0))
               all_sprites.draw(screen)
-              screen.blit(frame, ( 0, 500 ) )
+              screen.blit(preview, ( 0, 500 ) )
+              #screen.blit(frame, ( 0, 500 ) )
               draw_health(screen, player.health, 60, 32 )
               screen.blit(healthstate_head, (10,10))
               
@@ -510,20 +590,18 @@ def run():
               else :
                   draw_text( screen, "Bad!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
 
+              pygame.sprite.groupcollide(attackObstacles, bullets, True, True)
               hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_circle) # 注意碰撞範圍
               for hit in hits :                  
                   player.health -= hit.energy
                   if player.health <= 0 :
                       VideoFileClip(lose_mp4).preview()
                       show_init = True
-                      #cap.release()
-                      #cv2.destroyAllWindows()    
+    
 
               if time == 0 and  player.health > 0:
                   VideoFileClip(win_mp4).preview()
                   show_init = True
-                  #cap.release()
-                  #cv2.destroyAllWindows()   
 
               pygame.display.update()
 

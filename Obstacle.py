@@ -1,6 +1,8 @@
 import pygame
 import os
+import Merge
 obstacle = []
+attackObstacles = pygame.sprite.Group()
 
 class Jump_Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -20,6 +22,8 @@ class Jump_Obstacle(pygame.sprite.Sprite) :
 
     def update(self) :
         self.rect.x -= self.speed_X
+        if self.rect.right < 0:
+            self.kill()
 
 class Attack_Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -39,6 +43,8 @@ class Attack_Obstacle(pygame.sprite.Sprite) :
 
     def update(self) :
         self.rect.x -= self.speed_X
+        if self.rect.right < 0:
+            self.kill()
 
 class Slide_Obstacle(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -58,18 +64,22 @@ class Slide_Obstacle(pygame.sprite.Sprite) :
 
     def update(self) :
         self.rect.x -= self.speed_X
+        if self.rect.right < 0:
+            self.kill()
 
 def New_JumpObstacle(all_sprites, obstacles) :
     o = Jump_Obstacle()
     all_sprites.add(o)
     obstacles.add(o) 
 
-def New_AttackObstacle(all_sprites, obstacles) :
+def New_AttackObstacle(all_sprites, obstacles, attackObstacles) :
     o = Attack_Obstacle()
     all_sprites.add(o)
     obstacles.add(o)
+    attackObstacles.add(o)
+
 
 def New_SlideObstacle(all_sprites, obstacles) :
     o = Slide_Obstacle()
     all_sprites.add(o)
-    obstacles.add(o)   
+    obstacles.add(o)  
