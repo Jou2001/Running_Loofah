@@ -62,9 +62,16 @@ timer = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) # create screen
 pygame.display.set_caption('Running loofah') # 開始前標題
 # load into picture
-ground_img = pygame.image.load(os.path.join("img", "ground.png")).convert_alpha()
+ground_img = pygame.image.load(os.path.join("img", "ground01.png")).convert_alpha()
+ground_img = pygame.transform.scale( ground_img, (960, 203) )
 background1_img = pygame.image.load(os.path.join("img", "background01.png")).convert()
+background1_img = pygame.transform.scale( background1_img, (960, 600) )
 background2_img = pygame.image.load(os.path.join("img", "background02.png")).convert()
+background2_img = pygame.transform.scale( background2_img, (960, 600) )
+background3_img = pygame.image.load(os.path.join("img", "background03.png")).convert()
+background3_img = pygame.transform.scale( background3_img, (960, 600) )
+background4_img = pygame.image.load(os.path.join("img", "background04.png")).convert()
+background4_img = pygame.transform.scale( background4_img, (960, 600) )
 
 takephoto = pygame.image.load(os.path.join("img", "takephoto.png")).convert_alpha()
 takephoto = pygame.transform.scale( takephoto, (WIDTH, HEIGHT) )
@@ -98,11 +105,25 @@ good_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Good.mp3"))
 
 
 load_image = []
-#obstacle = []
 player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
 healthstate_head = pygame.image.load(os.path.join("img", "healthstate_head.png")).convert_alpha()
 # load into txt
 fout_txt = os.path.join( "Handwriting.ttf" )
+
+
+obstacles = []
+for i in range(0, 4) :
+    image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+    if i+1 == 1:
+        image = pygame.transform.scale( image, (101, 140) ) # 蟲蟲 202*279
+    if i+1 == 2:
+        image = pygame.transform.scale( image, (140, 151) ) # 老鼠 281*303
+    if i+1 == 3 :
+        image = pygame.transform.scale( image, (300, 300) ) # 飛天雞 2048*2048
+    if i+1 == 4 :
+        image = pygame.transform.scale( image, (204, 204) ) # 球 408*408
+    obstacles.append( image )
+
 
 
 def ReadVideo(videoName, txt, txtSize) :
@@ -478,33 +499,19 @@ class Bullet(pygame.sprite.Sprite) :
         if self.rect.left >= WIDTH:
             self.kill()
 
-class Ground1(pygame.sprite.Sprite) :
+class Ground(pygame.sprite.Sprite) :
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
         self.image = ground_img
         self.rect = self.image.get_rect()
         self.rect.x = 0
-        self.rect.bottom = HEIGHT
+        self.rect.bottom = HEIGHT + 30
         self.speed_X = 3
 
     def update(self) :
         self.rect.x -= self.speed_X
-        if self.rect.right < 0 :
-            self.rect.x = WIDTH - 10
-
-class Ground2(pygame.sprite.Sprite) :
-    def __init__(self) :
-        pygame.sprite.Sprite.__init__(self)
-        self.image = ground_img
-        self.rect = self.image.get_rect()
-        self.rect.x = WIDTH 
-        self.rect.bottom = HEIGHT
-        self.speed_X = 3
-
-    def update(self) :
-        self.rect.x -= self.speed_X
-        if self.rect.right < 0 :
-            self.rect.x = WIDTH - 10
+        if self.rect.right <= 0 :
+            self.rect.x = WIDTH
 
 
 def draw_health(surf, hp, x, y ):
@@ -538,7 +545,7 @@ def run():
     else :
       pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
       pygame.mixer_music.play()
-      draw_start()
+      # draw_start()
 
       while running :       
           # get input
@@ -564,10 +571,12 @@ def run():
               all_sprites = pygame.sprite.Group()
               obstacles = pygame.sprite.Group()
 
-              ground1 = Ground1()
-              all_sprites.add(ground1)
-              ground2 = Ground2()
-              all_sprites.add(ground2)
+              ground01 = Ground()
+              all_sprites.add(ground01)
+              ground02 = Ground()
+              ground02.rect.x = WIDTH
+              all_sprites.add(ground02)
+
               player = Player()
               all_sprites.add(player)
 
@@ -613,7 +622,7 @@ def run():
               
              
               # display
-              screen.blit(background2_img, (0,0))
+              screen.blit(background4_img, (0,0))
               all_sprites.draw(screen)
               screen.blit(preview, ( 0, 500 ) )
               #screen.blit(frame, ( 0, 500 ) )
