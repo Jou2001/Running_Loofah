@@ -126,7 +126,7 @@ def Photograph(screen, fps, timer, cam):
     Merge.draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
     Merge.draw_text( screen, 'please raise your hand', 30, WIDTH/2, HEIGHT/5+30 )
     if str(int(sec)) != "0" :
-      Merge.draw_text( screen, str(int(sec)), 200, WIDTH/2, HEIGHT/5 )   
+      Merge.draw_text( screen, str(int(sec)), 100, WIDTH/2, HEIGHT/1.2 )   
 
     pygame.display.update()
     

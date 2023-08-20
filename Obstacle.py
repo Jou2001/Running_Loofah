@@ -8,15 +8,16 @@ class Jump_Obstacle(pygame.sprite.Sprite) : # 4.球 408*408
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
         self.speed_X = 15
-        self.radius = 10
-        self.img_ori = Merge.obstacles[3]
+        self.radius = 100
+        self.img_ori = Merge.obstacle[3]
         self.image = self.img_ori.copy()
         self.rect = self.image.get_rect()
         self.rect.x = 960
-        self.rect.bottom = 500
+        self.rect.bottom = 450
         self.energy = 10
         self.rot_degree = 3
         self.total_degree = 0
+        self.mask = pygame.mask.from_surface(self.image)  
 
     def update(self) :
         self.rotate()
@@ -34,11 +35,12 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
         pygame.sprite.Sprite.__init__(self)
         self.speed_X = 15
         self.radius = 10
-        self.image = Merge.obstacles[1]
+        self.image = Merge.obstacle[1]
         self.rect = self.image.get_rect()
         self.rect.x = 960
         self.rect.bottom = 500
         self.energy = 10
+        self.mask = pygame.mask.from_surface(self.image)  
 
     def update(self) :
         self.rect.x -= self.speed_X
@@ -50,11 +52,12 @@ class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
         pygame.sprite.Sprite.__init__(self)
         self.speed_X = 15
         self.radius = 80
-        self.image = Merge.obstacles[2]
+        self.image = Merge.obstacle[2]
         self.rect = self.image.get_rect()
         self.rect.x = 960
         self.rect.bottom = 350
         self.energy = 15
+        self.mask = pygame.mask.from_surface(self.image)  
 
     def update(self) :
         self.rect.x -= self.speed_X

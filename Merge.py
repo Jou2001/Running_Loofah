@@ -111,7 +111,7 @@ healthstate_head = pygame.image.load(os.path.join("img", "healthstate_head.png")
 fout_txt = os.path.join( "Handwriting.ttf" )
 
 
-obstacles = []
+obstacle = []
 for i in range(0, 4) :
     image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
     if i+1 == 1:
@@ -122,7 +122,7 @@ for i in range(0, 4) :
         image = pygame.transform.scale( image, (300, 300) ) # 飛天雞 2048*2048
     if i+1 == 4 :
         image = pygame.transform.scale( image, (204, 204) ) # 球 408*408
-    obstacles.append( image )
+    obstacle.append( image )
 
 
 
@@ -150,6 +150,7 @@ def ReadVideo(videoName, txt, txtSize) :
 
 def draw_text( surf, text, size, x, y ) :
     font = pygame.font.Font( fout_txt, size )
+    # font = pygame.font.SysFont( "arial", size )
     text_surface = font.render( text, True, WHITE )
     text_rect = text_surface.get_rect()
     text_rect.centerx = x
@@ -368,7 +369,8 @@ class Player(pygame.sprite.Sprite) :
         self.isGoodAttack = 0  
         self.keyjump = 0
         self.keydown = 0
-        self.keyattack = 0     
+        self.keyattack = 0   
+        self.mask = pygame.mask.from_surface(self.image)  
 
     def update(self) :
         self.mode_jump = RecognitionSquat.main(cap)
@@ -414,11 +416,11 @@ class Player(pygame.sprite.Sprite) :
         elif self.change_y > 0 or self.rect.y < PLAYER_Y : 
             self.rect.y -= self.change_y
             self.change_y -= gravity
-            if (self.countJump > 0 and self.change_y < 0 and self.mode_jump != 3) or \
+            if (self.countJump > 0 and self.change_y < 0 and ( self.mode_jump == 1 and self.mode_jump == 2 ) ) or \
                (self.countJump > 0 and self.change_y < 0 and ( key_pressed[pygame.K_UP] or key_pressed[pygame.K_RIGHT] )) :
                 self.rect.y += self.change_y
                 self.change_y += gravity
-            if (self.countJump > 0 and self.change_y < 0 and self.mode_jump == 3) or \
+            if (self.countJump > 0 and self.change_y < 0 and ( self.mode_jump == 3 or self.mode_jump == None ) ) or \
                (self.countJump > 0 and self.change_y < 0 and ( not key_pressed[pygame.K_UP] and not key_pressed[pygame.K_RIGHT] )) :
                 self.countJump = 0
 
@@ -450,12 +452,12 @@ class Player(pygame.sprite.Sprite) :
             self.image = player_slip_img     
             self.rect.y = PLAYER_Y + 85
 
-        elif (self.countdown > 0 and self.mode_down != 3) or \
+        elif (self.countdown > 0 and self.mode_down == 1 and self.mode_down == 2 ) or \
              (self.countdown > 0 and ( key_pressed[pygame.K_DOWN] or key_pressed[pygame.K_LEFT] )) :
             self.image = player_slip_img 
             self.rect.y = PLAYER_Y + 85
             
-        elif (self.countdown > 0 and self.mode_down == 3) or \
+        elif (self.countdown > 0 and ( self.mode_down == 3 or self.mode_down == None ) ) or \
              (self.countdown > 0 and ( not key_pressed[pygame.K_DOWN] and not key_pressed[pygame.K_LEFT] )) :
             self.countdown = 0
             self.image = load_image[0]
@@ -477,7 +479,7 @@ class Player(pygame.sprite.Sprite) :
             bullets.add(bullet)
             self.countattack = PLAYER_ATTACK
             
-        elif (self.countattack > 0 and self.mode_attack != 3) or \
+        elif (self.countattack > 0 and (self.mode_attack == 1 and self.mode_attack == 2) ) or \
              (self.countattack > 0 and ( key_pressed[pygame.K_LEFT] ) ):
             self.countattack -= 1
             bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+10))
@@ -653,27 +655,27 @@ def run():
               elif player.mode_jump == 3 or player.keyjump == 0 :
                   draw_text( screen, "Bad Jump!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
                   
-              if player.mode_down == 1 :
+              if player.mode_down == 1 or player.keydown == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   draw_text( screen, "Good Slip!" , 20, WIDTH/2, BAR_HEIGHT + 40 )
-              elif player.mode_down == 2 :
+              elif player.mode_down == 2 or player.keydown == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   draw_text( screen, "So so Slip!" , 20, WIDTH/2, BAR_HEIGHT + 40 )
-              elif player.mode_down == 3 :
+              elif player.mode_down == 3 or player.keydown == 0 :
                   draw_text( screen, "Bad Slip!" , 20, WIDTH/2, BAR_HEIGHT + 40 )
                   
-              if player.mode_attack == 1 :
+              if player.mode_attack == 1 or player.keyattack == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   draw_text( screen, "Good Attack!" , 20, WIDTH/2, BAR_HEIGHT + 60 )
-              elif player.mode_attack == 2 :
+              elif player.mode_attack == 2 or player.keyattack == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   draw_text( screen, "So so Attack!" , 20, WIDTH/2, BAR_HEIGHT + 60 )
-              elif player.mode_attack == 3 :
+              elif player.mode_attack == 3 or player.keyattack == 0 :
                   draw_text( screen, "Bad Attack!" , 20, WIDTH/2, BAR_HEIGHT + 60 )
 
               pygame.sprite.groupcollide(attackObstacles, bullets, True, True)
-              hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_circle) # 注意碰撞範圍
-              for hit in hits :                  
+              hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_mask) # 注意碰撞範圍
+              for hit in hits :               
                   player.health -= hit.energy
                   if player.health <= 0 :
                       lose_mp4.preview()
