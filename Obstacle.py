@@ -51,6 +51,8 @@ class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
         self.speed_X = 15
+        self.gravity = 5
+        self.change_y = 10
         self.radius = 80
         self.image = Merge.obstacle[2]
         self.rect = self.image.get_rect()
@@ -61,6 +63,17 @@ class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
 
     def update(self) :
         self.rect.x -= self.speed_X
+        self.rect.bottom -= self.change_y
+        self.change_y -= self.gravity 
+
+        if self.rect.bottom >= 350 : 
+            self.rect.bottom = 350
+        if self.rect.bottom < 300 :
+            self.rect.bottom = 300
+        
+        if self.rect.bottom == 350 and self.change_y < 0 :
+            self.change_y = 10    
+
         if self.rect.right < 0:
             self.kill()
 
