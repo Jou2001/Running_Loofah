@@ -37,6 +37,15 @@ def main(cap):
 
     if results.pose_world_landmarks:
         # mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+
+        # Hand
+        wrist_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST]
+        wrist_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]
+        elbow_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ELBOW]
+        elbow_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW]
+        shoulder_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
+        shoulder_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]   
+
         # 获取关键点坐标
         hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
         hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
@@ -48,16 +57,20 @@ def main(cap):
         # 计算角度
         angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
         angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
+        angle_left_hand = angle_between_points(wrist_left, elbow_left, shoulder_left)
+        angle_right_hand = angle_between_points(wrist_right, elbow_right, shoulder_right)
 
-        print( knee_left.visibility )    
+        # print( knee_left.visibility )    
         # 左腳
-        if (angle_left_knee >= 90 and angle_left_knee <= 120) and (angle_right_knee >= 90 and angle_right_knee <= 120): # 綠色 標準動作
+        if (angle_left_knee >= 90 and angle_left_knee <= 120) and (angle_right_knee >= 90 and angle_right_knee <= 120) and \
+           (angle_left_hand >= 75 and angle_left_hand <= 90 ) and (angle_right_hand >= 75 and angle_right_hand <= 90 ) : # 綠色 標準動作
             return 1
             # cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360)
             #             , cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA
             #             )
         elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and \
-             (( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色
+             (( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)) and \
+             (angle_left_hand >= 40 and angle_left_hand < 75 ) and (angle_right_hand >= 40 and angle_right_hand < 75 ): # 黃色
             return 2
             # cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360)
             #             , cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA
