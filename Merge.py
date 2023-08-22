@@ -22,6 +22,7 @@ mp_drawing_styles = mp.solutions.drawing_styles
 pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 all_sprites = pygame.sprite.Group()
+back_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 attackObstacles = pygame.sprite.Group()
 
@@ -75,22 +76,42 @@ background4_img = pygame.transform.scale( background4_img, (960, 600) )
 
 takephoto = pygame.image.load(os.path.join("img", "takephoto.png")).convert_alpha()
 takephoto = pygame.transform.scale( takephoto, (WIDTH, HEIGHT) )
-button_start = pygame.image.load(os.path.join("img", "button_start.png")).convert_alpha()
-button_start = pygame.transform.scale( button_start, (200, 200) )
-startgame_word = pygame.image.load(os.path.join("img", "startgame_word.png")).convert_alpha()
-startgame_word = pygame.transform.scale( startgame_word, (WIDTH, HEIGHT) )
 
 intro_attack = pygame.image.load(os.path.join("img", "intro_attack.png")).convert_alpha()
-intro_attack = pygame.transform.scale( intro_attack, (210, 340) )
+intro_attack = pygame.transform.scale( intro_attack, (210, 340) ) # 420*680
 intro_jump = pygame.image.load(os.path.join("img", "intro_jump.png")).convert_alpha()
-intro_jump = pygame.transform.scale( intro_jump, (170, 295) )
+intro_jump = pygame.transform.scale( intro_jump, (170, 295) ) # 340*590
 intro_slip_1 = pygame.image.load(os.path.join("img", "intro_slip_1.png")).convert_alpha()
-intro_slip_1 = pygame.transform.scale( intro_slip_1, (280, 300) )
+intro_slip_1 = pygame.transform.scale( intro_slip_1, (280, 300) ) # 560*300
 intro_slip_2 = pygame.image.load(os.path.join("img", "intro_slip_2.png")).convert_alpha()
-intro_slip_2 = pygame.transform.scale( intro_slip_2, (280, 300) )
+intro_slip_2 = pygame.transform.scale( intro_slip_2, (280, 300) ) # 560*300
+intro_handup_left = pygame.image.load(os.path.join("img", "intro_handup_left.png")).convert_alpha()
+intro_handup_left = pygame.transform.scale( intro_handup_left, (234, 334) ) # 468*668
+intro_handup_right = pygame.image.load(os.path.join("img", "intro_handup_right.png")).convert_alpha()
+intro_handup_right = pygame.transform.scale( intro_handup_right, (234, 334) ) # 468*668
 
 bullet = pygame.image.load(os.path.join("img", "bullet.png")).convert_alpha()
 bullet = pygame.transform.scale( bullet, (50, 57) )
+
+cloud = []
+for i in range(0, 3) :
+    image = pygame.image.load(os.path.join("img", "cloud0" + str(i+1) + ".png")).convert_alpha()
+    if i+1 == 1:
+        image = pygame.transform.scale( image, (174, 99) ) # 348*178
+    if i+1 == 2:
+        image = pygame.transform.scale( image, (109, 79) ) # 218*158
+    if i+1 == 3 :
+        image = pygame.transform.scale( image, (179, 104) ) # 358*208
+    cloud.append( image )
+
+tree = []
+image = pygame.image.load(os.path.join("img", "grove.png")).convert_alpha()
+image = pygame.transform.scale( image, (319, 239) ) # 638*478
+tree.append( image )
+image = pygame.image.load(os.path.join("img", "tree.png")).convert_alpha()
+image = pygame.transform.scale( image, (244, 424) ) # 488*848
+tree.append( image )
+
 #load mp4
 do_the_following_mp4 = VideoFileClip(os.path.join("video", "do_the_following.mp4")).resize((960,600))
 start321_mp4 = VideoFileClip(os.path.join("video", "start321_mp3.mp4")).resize((960,600))
@@ -103,12 +124,11 @@ jump_mp3 = pygame.mixer.Sound(os.path.join("mp3", "jumpMusic.mp3"))
 good_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Good.mp3"))
 
 
-
 load_image = []
 player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
 healthstate_head = pygame.image.load(os.path.join("img", "healthstate_head.png")).convert_alpha()
 # load into txt
-# fout_txt = os.path.join( "Handwriting.ttf" )
+fout_txt = os.path.join( "Handwriting.ttf" )
 
 
 obstacle = []
@@ -149,8 +169,8 @@ def ReadVideo(videoName, txt, txtSize) :
             break
 
 def draw_text( surf, text, size, x, y ) :
-    # font = pygame.font.Font( "fout_txt", size )
-    font = pygame.font.SysFont( "arial", size )
+    font = pygame.font.Font( fout_txt, size )
+    # font = pygame.font.SysFont( "arial", size )
     text_surface = font.render( text, True, WHITE )
     text_rect = text_surface.get_rect()
     text_rect.centerx = x
@@ -160,12 +180,10 @@ def draw_text( surf, text, size, x, y ) :
 def draw_start() :
     global cap
 
-    key_pressed = pygame.key.get_pressed()
     screen.blit(background1_img, (0,0))
     # screen.blit(startgame_word, (0,0))
     # screen.blit(button_start, (380,300))
     pygame.display.update()
-    waiting = True
     time = 0
     past = pygame.time.get_ticks()
 
@@ -190,9 +208,18 @@ def draw_start() :
 
         pygame.display.update()
 
+def draw_intro() :
+    global cap
+
     #ReadVideo(do_the_following_mp4, "PLEASE DO THE FOLLOWING", 50)
     do_the_following_mp4.preview()
    
+    key_pressed = pygame.key.get_pressed()
+    time = 0
+    past = pygame.time.get_ticks()
+    count = 0
+    p = -1
+
     active = 1
     waiting = True
     while waiting :
@@ -201,13 +228,19 @@ def draw_start() :
         mode_attack = RecognitionAttack.main(cap)
         mode_next = RecongnitionNext.main(cap)
         ret, img = cap.read()
+        time, past = times_1(time, past)
+
+        if time % 2 == 0 and p != time :
+            count += 1
+            p = time
+
         if not ret:
           print("Cannot receive frame")
           exit()
       
         timer.tick(fps)
         screen.blit(background1_img, (0,0))
-    
+
         if active == 1 :
             screen.blit(intro_jump, (100,200))
             draw_text( screen, "HOW TO JUMP", 50, WIDTH/2, HEIGHT/10 ) # 60
@@ -220,6 +253,12 @@ def draw_start() :
         elif active == 4 :
             screen.blit(intro_attack, (100,170))
             draw_text( screen, "HOW TO ATTACK", 50, WIDTH/2, HEIGHT/10 ) # 60
+        elif active == 5 :
+            if count % 2 == 0 :
+                screen.blit(intro_handup_left, (100,170))
+            else :
+                screen.blit(intro_handup_right, (100,170))
+            draw_text( screen, "HOW TO SKIP", 50, WIDTH/2, HEIGHT/10 ) # 60
         else :
             waiting = False
 
@@ -262,13 +301,19 @@ def draw_start() :
             draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
             pygame.display.update()
             pygame.time.wait(500) 
-        elif (mode_down == 1 or key_pressed[pygame.K_DOWN])and ( active == 2 or active == 3 ) :
+        elif (mode_down == 1 or key_pressed[pygame.K_DOWN]) and ( active == 2 or active == 3 ) :
             active += 1
             good_mp3.play()
             draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 ) 
             pygame.display.update()
             pygame.time.wait(500) 
         elif (mode_attack == 1 or key_pressed[pygame.K_LEFT]) and active == 4 :
+            active += 1
+            good_mp3.play()
+            draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
+            pygame.display.update()
+            pygame.time.wait(500) 
+        elif (mode_next == 1 or key_pressed[pygame.K_RETURN]) and active == 5 :
             active += 1
             good_mp3.play()
             draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
@@ -489,17 +534,26 @@ class Player(pygame.sprite.Sprite) :
 class Bullet(pygame.sprite.Sprite) :
     def __init__(self, x, y) :
         pygame.sprite.Sprite.__init__(self)
-        self.image = bullet
+        self.img_ori = bullet
+        self.image = self.img_ori
         self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
         self.radius = 23
-        self.speedx = 50    
+        self.speedx = 50  
+        self.rot_degree = 20
+        self.total_degree = 0  
 
     def update(self) :
+        self.rotate()
         self.rect.x += self.speedx
         if self.rect.left >= WIDTH:
             self.kill()
+
+    def rotate(self) :
+        self.total_degree += self.rot_degree
+        self.total_degree = self.total_degree % 360
+        self.image = pygame.transform.rotate( self.img_ori, self.total_degree )
 
 class Ground(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -508,13 +562,41 @@ class Ground(pygame.sprite.Sprite) :
         self.rect = self.image.get_rect()
         self.rect.x = 0
         self.rect.bottom = HEIGHT + 30
-        self.speed_X = 3
+        self.speed_X = 10
 
     def update(self) :
         self.rect.x -= self.speed_X
         if self.rect.right <= 0 :
             self.rect.x = WIDTH
 
+class Cloud(pygame.sprite.Sprite) :
+    def __init__(self) :
+        pygame.sprite.Sprite.__init__(self)
+        self.image = cloud[random.randrange( 0, 3 )]
+        self.rect = self.image.get_rect()
+        self.rect.x = WIDTH # 960
+        self.rect.y = random.randrange( 0, 300 )
+        self.speed_X = random.randrange( 10, 15 )
+
+    def update(self) :
+        self.rect.x -= self.speed_X
+        if self.rect.right <= 0:
+            self.kill()
+
+class Tree(pygame.sprite.Sprite) :
+    def __init__(self) :
+        pygame.sprite.Sprite.__init__(self)
+        self.type = random.randrange( 0, 2 )
+        self.image = tree[self.type]
+        self.rect = self.image.get_rect()
+        self.rect.x = WIDTH # 960
+        self.rect.bottom = 530 
+        self.speed_X = 10
+
+    def update(self) :
+        self.rect.x -= self.speed_X
+        if self.rect.right <= 0:
+            self.kill()
 
 def draw_health(surf, hp, x, y ):
     if hp < 0:
@@ -547,7 +629,8 @@ def run():
     else :
       pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
       pygame.mixer_music.play()
-      # draw_start()
+      draw_start()
+      draw_intro()
 
       while running :       
           # get input
@@ -578,6 +661,18 @@ def run():
               ground02 = Ground()
               ground02.rect.x = WIDTH
               all_sprites.add(ground02)
+
+              count = random.randrange( 1, 3 )
+              for i in range( 0, count ) :
+                o = Cloud()
+                o.rect.x = random.randrange( 20, WIDTH )
+                back_sprites.add(o)
+
+              count = random.randrange( 1, 3 )
+              for i in range( 0, count ) :
+                o = Tree()
+                o.rect.x = random.randrange( 20, WIDTH )
+                back_sprites.add(o)
 
               player = Player()
               all_sprites.add(player)
@@ -618,13 +713,21 @@ def run():
                   Set.Set1(time, all_sprites, obstacles, attackObstacles)
 
               # update game
+              back_sprites.update()
               all_sprites.update()
               pygame.display.update()
-
-              
              
               # display
               screen.blit(background4_img, (0,0))
+              backornot = random.randrange( 0, 60 )
+              if backornot == 4 :
+                o = Cloud()
+                back_sprites.add(o)
+              if backornot == 20 :
+                o = Tree()
+                back_sprites.add(o)
+
+              back_sprites.draw(screen)
               all_sprites.draw(screen)
               screen.blit(preview, ( 0, 500 ) )
               #screen.blit(frame, ( 0, 500 ) )
