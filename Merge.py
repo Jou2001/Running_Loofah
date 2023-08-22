@@ -18,8 +18,8 @@ import mediapipe as mp
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
-
-pose = mp_pose.Pose()
+mp_drawing_styles = mp.solutions.drawing_styles
+pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
 all_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
@@ -62,9 +62,16 @@ timer = pygame.time.Clock()
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) # create screen
 pygame.display.set_caption('Running loofah') # 開始前標題
 # load into picture
-ground_img = pygame.image.load(os.path.join("img", "ground.png")).convert_alpha()
+ground_img = pygame.image.load(os.path.join("img", "ground01.png")).convert_alpha()
+ground_img = pygame.transform.scale( ground_img, (960, 203) )
 background1_img = pygame.image.load(os.path.join("img", "background01.png")).convert()
+background1_img = pygame.transform.scale( background1_img, (960, 600) )
 background2_img = pygame.image.load(os.path.join("img", "background02.png")).convert()
+background2_img = pygame.transform.scale( background2_img, (960, 600) )
+background3_img = pygame.image.load(os.path.join("img", "background03.png")).convert()
+background3_img = pygame.transform.scale( background3_img, (960, 600) )
+background4_img = pygame.image.load(os.path.join("img", "background04.png")).convert()
+background4_img = pygame.transform.scale( background4_img, (960, 600) )
 
 takephoto = pygame.image.load(os.path.join("img", "takephoto.png")).convert_alpha()
 takephoto = pygame.transform.scale( takephoto, (WIDTH, HEIGHT) )
@@ -85,23 +92,39 @@ intro_slip_2 = pygame.transform.scale( intro_slip_2, (280, 300) )
 bullet = pygame.image.load(os.path.join("img", "bullet.png")).convert_alpha()
 bullet = pygame.transform.scale( bullet, (50, 57) )
 #load mp4
-do_the_following_mp4 = os.path.join("video", "do_the_following.mp4")
-start321_mp4 = os.path.join("video", "start321_mp3.mp4")
-win_mp4 = os.path.join("video", "win_mp3.mp4")
-lose_mp4 = os.path.join("video", "lose_mp3.mp4")
+do_the_following_mp4 = VideoFileClip(os.path.join("video", "do_the_following.mp4")).resize((960,600))
+start321_mp4 = VideoFileClip(os.path.join("video", "start321_mp3.mp4")).resize((960,600))
+win_mp4 = VideoFileClip(os.path.join("video", "win_mp3.mp4")).resize((960,600))
+lose_mp4 = VideoFileClip(os.path.join("video", "lose_mp3.mp4")).resize((960,600))
 
 #load music mp3
 camera_mp3 = pygame.mixer.Sound(os.path.join("mp3", "cameraMusic.mp3"))
 jump_mp3 = pygame.mixer.Sound(os.path.join("mp3", "jumpMusic.mp3"))
-pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
+good_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Good.mp3"))
+
 
 
 load_image = []
-#obstacle = []
 player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
 healthstate_head = pygame.image.load(os.path.join("img", "healthstate_head.png")).convert_alpha()
 # load into txt
-fout_txt = os.path.join( "Handwriting.ttf" )
+# fout_txt = os.path.join( "Handwriting.ttf" )
+
+
+obstacle = []
+for i in range(0, 4) :
+    image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+    if i+1 == 1:
+        image = pygame.transform.scale( image, (101, 140) ) # 蟲蟲 202*279
+    if i+1 == 2:
+        image = pygame.transform.scale( image, (140, 151) ) # 老鼠 281*303
+    if i+1 == 3 :
+        image = pygame.transform.scale( image, (300, 300) ) # 飛天雞 2048*2048
+    if i+1 == 4 :
+        image = pygame.transform.scale( image, (204, 204) ) # 球 408*408
+    obstacle.append( image )
+
+
 
 def ReadVideo(videoName, txt, txtSize) :
     video = cv2.VideoCapture(videoName)
@@ -126,7 +149,8 @@ def ReadVideo(videoName, txt, txtSize) :
             break
 
 def draw_text( surf, text, size, x, y ) :
-    font = pygame.font.Font( fout_txt, size )
+    # font = pygame.font.Font( "fout_txt", size )
+    font = pygame.font.SysFont( "arial", size )
     text_surface = font.render( text, True, WHITE )
     text_rect = text_surface.get_rect()
     text_rect.centerx = x
@@ -154,7 +178,7 @@ def draw_start() :
         count_line = HEIGHT/10
         plus = 20
         txt_size = 20
-        draw_text( screen, "INTRODUCE", 50, WIDTH/2, count_line ) # 60
+        draw_text( screen, "INTRODUCE", 50, WIDTH/2, count_line ) # 60 
         count_line = count_line + plus + 50
         for txt in txt_line :
             draw_text( screen, txt, txt_size, WIDTH/2, count_line ) 
@@ -166,7 +190,8 @@ def draw_start() :
 
         pygame.display.update()
 
-    ReadVideo(do_the_following_mp4, "PLEASE DO THE FOLLOWING", 50)
+    #ReadVideo(do_the_following_mp4, "PLEASE DO THE FOLLOWING", 50)
+    do_the_following_mp4.preview()
    
     active = 1
     waiting = True
@@ -205,6 +230,7 @@ def draw_start() :
             #    if event.key == pygame.K_UP :
             #        active += 1
         preview = img.copy() 
+        
         # img = cv2.resize(img,(int(img.shape[1]*0.6),int(img.shape[0]*0.6)))
         # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # img = np.rot90(img)
@@ -214,12 +240,12 @@ def draw_start() :
         
         rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
         
-        results = pose.process(rgbframe) # 從影像增測姿勢  
-
-        mp_drawing.draw_landmarks(preview, results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
-        mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-        
-        cv2.imshow( "AAAA", cv2.flip(preview, 1))       
+        results = pose.process(rgbframe) # 從影像增測姿勢
+       
+        # mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+        # mp_drawing.draw_landmarks(preview, results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS) 
+        # cv2.imshow( "AAAA", cv2.flip(preview, 1)) 
+      
         preview = cv2.resize(preview,(int(preview.shape[1]*0.6),int(preview.shape[0]*0.6)))
 
         
@@ -228,20 +254,23 @@ def draw_start() :
         preview = pygame.surfarray.make_surface(preview)
         screen.blit(preview, ( 450, 200 ) )
 
+        key_pressed = pygame.key.get_pressed() 
 
-
-        if mode_jump == 1 and active == 1 :
+        if (mode_jump == 1 or key_pressed[pygame.K_UP] ) and active == 1 :
             active += 1
+            good_mp3.play()
             draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
             pygame.display.update()
             pygame.time.wait(500) 
-        elif mode_down == 1 and active == 2 :
+        elif (mode_down == 1 or key_pressed[pygame.K_DOWN])and ( active == 2 or active == 3 ) :
             active += 1
+            good_mp3.play()
             draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 ) 
             pygame.display.update()
             pygame.time.wait(500) 
-        elif mode_attack == 1 and active == 3 :
+        elif (mode_attack == 1 or key_pressed[pygame.K_LEFT]) and active == 4 :
             active += 1
+            good_mp3.play()
             draw_text( screen, "Good!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
             pygame.display.update()
             pygame.time.wait(500) 
@@ -251,17 +280,35 @@ def draw_start() :
         
     
 def draw_init() :
-    global player_slip_img, healthstate_head, cap
+    global player_slip_img, healthstate_head, load_image, cap
     screen.blit(background1_img, (0,0))
-    draw_text( screen, 'running loofah', 65, WIDTH/2, HEIGHT/10 )
-    draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
+    pygame.display.update()
+    time = 0
+    past = pygame.time.get_ticks()
+
+
+    while time != 3 :
+        timer.tick(fps)
+        time, past = times_1(time, past)
+        screen.blit(background1_img, (0,0))
+        draw_text( screen, 'align your head with the circle', 50, WIDTH/2, HEIGHT/5 )
+        draw_text( screen, 'please raise your hand', 50, WIDTH/2, HEIGHT/5+50 )
+
+        for event in pygame.event.get() :
+          if event.type == pygame.QUIT :
+            pygame.quit()
+
+        pygame.display.update()
+
+
+    screen.blit(background1_img, (0,0))
     pygame.display.update()
     faceOK = HeadPlusBody.Photograph( screen, fps, timer, cap ) 
 
 
-    VideoFileClip(start321_mp4).preview()
+    start321_mp4.preview()
 
-
+    load_image = []
     for i in range( 16 ) :
       image = pygame.image.load(os.path.join("picture", "player" , "RUN_" + str(i+1) + ".png")).convert_alpha()
       image = pygame.transform.scale( image, (178, 215) )
@@ -317,7 +364,13 @@ class Player(pygame.sprite.Sprite) :
         self.mode_down = 0
         self.mode_attack = 0
         self.key_pressed = 0
-        
+        self.isGoodJump = 0
+        self.isGoodDown = 0    
+        self.isGoodAttack = 0  
+        self.keyjump = 0
+        self.keydown = 0
+        self.keyattack = 0   
+        self.mask = pygame.mask.from_surface(self.image)  
 
     def update(self) :
         self.mode_jump = RecognitionSquat.main(cap)
@@ -342,23 +395,33 @@ class Player(pygame.sprite.Sprite) :
 
     def jump(self):  
         key_pressed = pygame.key.get_pressed() 
-        #if self.mode_jump == 1 and self.change_y == 0 and self.countJump >= 0 :
-        if key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0 : # key_pressed[pygame.K_RIGHT]    
+        if self.mode_jump == 1:
+            self.isGoodJump += 1 
+        if self.mode_jump == 3:
+            self.isGoodJump = 0 
+
+        if key_pressed[pygame.K_UP] :
+            self.keyjump = 1
+        if key_pressed[pygame.K_RIGHT] :
+            self.keyjump = 2
+            
+        if (self.mode_jump == 1 and self.change_y == 0 and self.countJump >= 0 and self.isGoodJump >= 2) or \
+           (key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0) : # key_pressed[pygame.K_RIGHT]
             if self.rect.y == PLAYER_Y :
               jump_mp3.play()   
 
             self.change_y = 60
             self.countJump = PLAYER_JUMP
 
-        elif self.change_y > 0 or self.rect.y < PLAYER_Y :
+        elif self.change_y > 0 or self.rect.y < PLAYER_Y : 
             self.rect.y -= self.change_y
             self.change_y -= gravity
-            #if self.countJump > 0 and self.change_y < 0 and self.mode_jump != 3 :
-            if self.countJump > 0 and self.change_y < 0 and ( key_pressed[pygame.K_UP] or key_pressed[pygame.K_RIGHT] ) :
+            if (self.countJump > 0 and self.change_y < 0 and ( self.mode_jump == 1 and self.mode_jump == 2 ) ) or \
+               (self.countJump > 0 and self.change_y < 0 and ( key_pressed[pygame.K_UP] or key_pressed[pygame.K_RIGHT] )) :
                 self.rect.y += self.change_y
                 self.change_y += gravity
-            #if self.countJump > 0 and self.change_y < 0 and self.mode_jump == 3 :
-            if self.countJump > 0 and self.change_y < 0 and ( not key_pressed[pygame.K_UP] and not key_pressed[pygame.K_RIGHT] ) :
+            if (self.countJump > 0 and self.change_y < 0 and ( self.mode_jump == 3 or self.mode_jump == None ) ) or \
+               (self.countJump > 0 and self.change_y < 0 and ( not key_pressed[pygame.K_UP] and not key_pressed[pygame.K_RIGHT] )) :
                 self.countJump = 0
 
         # keep height and low
@@ -378,35 +441,46 @@ class Player(pygame.sprite.Sprite) :
 
     def down(self):       
         key_pressed = pygame.key.get_pressed()
-        #if self.mode_down == 1 and self.change_y == 0 and self.countdown >= 0 :
-        if key_pressed[pygame.K_DOWN] and self.countdown >= 0 : # key_pressed[pygame.K_RIGHT]
+        if self.mode_down == 1:
+            self.isGoodDown += 1
+        if self.mode_down == 3:
+            self.isGoodDown = 0
+
+        if (self.mode_down == 1 and self.change_y == 0 and self.countdown >= 0 and self.isGoodDown >= 2) or \
+           (key_pressed[pygame.K_DOWN] and self.countdown >= 0) : # key_pressed[pygame.K_RIGHT]
             self.countdown = PLAYER_DOWN
             self.image = player_slip_img     
             self.rect.y = PLAYER_Y + 85
 
-        #elif self.countdown > 0 and self.mode_down != 3 :
-        elif self.countdown > 0 and ( key_pressed[pygame.K_DOWN] or key_pressed[pygame.K_LEFT] ) :
+        elif (self.countdown > 0 and self.mode_down == 1 and self.mode_down == 2 ) or \
+             (self.countdown > 0 and ( key_pressed[pygame.K_DOWN] or key_pressed[pygame.K_LEFT] )) :
             self.image = player_slip_img 
             self.rect.y = PLAYER_Y + 85
             
-        #elif self.countdown > 0 and self.mode_down == 3 :
-        elif self.countdown > 0 and ( not key_pressed[pygame.K_DOWN] and not key_pressed[pygame.K_LEFT] ) :
+        elif (self.countdown > 0 and ( self.mode_down == 3 or self.mode_down == None ) ) or \
+             (self.countdown > 0 and ( not key_pressed[pygame.K_DOWN] and not key_pressed[pygame.K_LEFT] )) :
             self.countdown = 0
             self.image = load_image[0]
             self.run_time = 0 
             self.rect.y = PLAYER_Y
+            self.isGoodDown = 0
 
     def shoot(self) :
         key_pressed = pygame.key.get_pressed()
-        #if self.mode_attack == 1 and self.countattack >= 0 :
-        if ( key_pressed[pygame.K_LEFT] ) :
+        if self.mode_attack == 1:
+            self.isGoodAttack += 1
+        if self.mode_attack == 3:
+            self.isGoodAttack = 0
+
+        if (self.mode_attack == 1 and self.countattack >= 0 and self.isGoodAttack >= 2) or \
+           (key_pressed[pygame.K_LEFT]) :
             bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+10))
             all_sprites.add(bullet)
             bullets.add(bullet)
             self.countattack = PLAYER_ATTACK
             
-        #elif self.countattack > 0 and self.mode_attack != 3 :
-        elif self.countattack > 0 and ( key_pressed[pygame.K_LEFT] ) :
+        elif (self.countattack > 0 and (self.mode_attack == 1 and self.mode_attack == 2) ) or \
+             (self.countattack > 0 and ( key_pressed[pygame.K_LEFT] ) ):
             self.countattack -= 1
             bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+10))
             all_sprites.add(bullet)
@@ -427,33 +501,19 @@ class Bullet(pygame.sprite.Sprite) :
         if self.rect.left >= WIDTH:
             self.kill()
 
-class Ground1(pygame.sprite.Sprite) :
+class Ground(pygame.sprite.Sprite) :
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
         self.image = ground_img
         self.rect = self.image.get_rect()
         self.rect.x = 0
-        self.rect.bottom = HEIGHT
+        self.rect.bottom = HEIGHT + 30
         self.speed_X = 3
 
     def update(self) :
         self.rect.x -= self.speed_X
-        if self.rect.right < 0 :
-            self.rect.x = WIDTH - 10
-
-class Ground2(pygame.sprite.Sprite) :
-    def __init__(self) :
-        pygame.sprite.Sprite.__init__(self)
-        self.image = ground_img
-        self.rect = self.image.get_rect()
-        self.rect.x = WIDTH 
-        self.rect.bottom = HEIGHT
-        self.speed_X = 3
-
-    def update(self) :
-        self.rect.x -= self.speed_X
-        if self.rect.right < 0 :
-            self.rect.x = WIDTH - 10
+        if self.rect.right <= 0 :
+            self.rect.x = WIDTH
 
 
 def draw_health(surf, hp, x, y ):
@@ -485,8 +545,9 @@ def run():
         print("Cannot open camera")
         exit()
     else :
-      pygame.mixer_music.play(-1)
-      draw_start()
+      pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
+      pygame.mixer_music.play()
+      # draw_start()
 
       while running :       
           # get input
@@ -496,10 +557,12 @@ def run():
               # open camera
               if not pygame.mixer.music.get_busy() :
                   pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
-                  pygame.mixer_music.set_volume(0.5)
-                  pygame.mixer_music.play(-1)
+                  pygame.mixer_music.play()
 
               draw_init()
+              
+              pygame.mixer_music.load(os.path.join("mp3", "game_music.mp3"))
+              pygame.mixer_music.play()
               # init timer
               time = 60
               now = pygame.time.get_ticks()
@@ -510,10 +573,12 @@ def run():
               all_sprites = pygame.sprite.Group()
               obstacles = pygame.sprite.Group()
 
-              ground1 = Ground1()
-              all_sprites.add(ground1)
-              ground2 = Ground2()
-              all_sprites.add(ground2)
+              ground01 = Ground()
+              all_sprites.add(ground01)
+              ground02 = Ground()
+              ground02.rect.x = WIDTH
+              all_sprites.add(ground02)
+
               player = Player()
               all_sprites.add(player)
 
@@ -533,7 +598,7 @@ def run():
               #frame = np.rot90(frame)
               #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
               #frame = pygame.surfarray.make_surface(frame) 
-
+              ### cv2.imshow( "AAAA", cv2.flip(frame, 1)) 
               rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
               results = pose.process(rgbframe) # 從影像增測姿勢  
               mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
@@ -547,9 +612,9 @@ def run():
               
               if changeTime:
                   # 隨機選擇並調用一個函數
-                  # if time % 30 == 0:
-                      # func = random.choice(functions)
-                  # func(time, all_sprites, obstacles)
+                  #if time % 30 == 0:
+                      #func = random.choice(functions)
+                  #func(time, all_sprites, obstacles)
                   Set.Set1(time, all_sprites, obstacles, attackObstacles)
 
               # update game
@@ -559,7 +624,7 @@ def run():
               
              
               # display
-              screen.blit(background2_img, (0,0))
+              screen.blit(background4_img, (0,0))
               all_sprites.draw(screen)
               screen.blit(preview, ( 0, 500 ) )
               #screen.blit(frame, ( 0, 500 ) )
@@ -581,26 +646,44 @@ def run():
               # print( "now: ", now, " past: ", past, "now-past: ", ( now - past ) / 1000 )
 
               player.key_pressed = pygame.key.get_pressed()
-              if player.mode_jump == 1 or player.mode_down == 1 :
+              if player.mode_jump == 1 or player.keyjump == 1 :
               #if player.key_pressed[pygame.K_UP] :
-                  draw_text( screen, "Good!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
-              elif player.mode_jump == 2 or player.mode_down == 2 :
+                  draw_text( screen, "Good Jump!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
+              elif player.mode_jump == 2 or player.keyjump == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
-                  draw_text( screen, "So so!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
-              else :
-                  draw_text( screen, "Bad!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
+                  draw_text( screen, "So so Jump!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
+              elif player.mode_jump == 3 or player.keyjump == 0 :
+                  draw_text( screen, "Bad Jump!" , 20, WIDTH/2, BAR_HEIGHT + 20 )
+                  
+              if player.mode_down == 1 or player.keydown == 1 :
+              #if player.key_pressed[pygame.K_UP] :
+                  draw_text( screen, "Good Slip!" , 20, WIDTH/2, BAR_HEIGHT + 40 )
+              elif player.mode_down == 2 or player.keydown == 2 :
+              #elif player.key_pressed[pygame.K_RIGHT] :
+                  draw_text( screen, "So so Slip!" , 20, WIDTH/2, BAR_HEIGHT + 40 )
+              elif player.mode_down == 3 or player.keydown == 0 :
+                  draw_text( screen, "Bad Slip!" , 20, WIDTH/2, BAR_HEIGHT + 40 )
+                  
+              if player.mode_attack == 1 or player.keyattack == 1 :
+              #if player.key_pressed[pygame.K_UP] :
+                  draw_text( screen, "Good Attack!" , 20, WIDTH/2, BAR_HEIGHT + 60 )
+              elif player.mode_attack == 2 or player.keyattack == 2 :
+              #elif player.key_pressed[pygame.K_RIGHT] :
+                  draw_text( screen, "So so Attack!" , 20, WIDTH/2, BAR_HEIGHT + 60 )
+              elif player.mode_attack == 3 or player.keyattack == 0 :
+                  draw_text( screen, "Bad Attack!" , 20, WIDTH/2, BAR_HEIGHT + 60 )
 
               pygame.sprite.groupcollide(attackObstacles, bullets, True, True)
-              hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_circle) # 注意碰撞範圍
-              for hit in hits :                  
+              hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_mask) # 注意碰撞範圍
+              for hit in hits :               
                   player.health -= hit.energy
                   if player.health <= 0 :
-                      VideoFileClip(lose_mp4).preview()
+                      lose_mp4.preview()
                       show_init = True
     
 
               if time == 0 and  player.health > 0:
-                  VideoFileClip(win_mp4).preview()
+                  win_mp4.preview()
                   show_init = True
 
               pygame.display.update()
