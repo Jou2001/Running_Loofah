@@ -2,18 +2,30 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-#cam = cv2.VideoCapture(0)
-#mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
+mp_drawing = mp.solutions.drawing_utils
 pose = mp_pose.Pose()
 
+class Coordinate:
+    def __init__(self, x=0, y=0, z=0):
+        self.x = x
+        self.y = y
+        self.z = z
 
- 
-def angle_between_points(a, b, c):
+def get_mid_point(a, b):
+    mid = Coordinate()
+    mid.x = (a.x + b.x) / 2
+    mid.y = (a.y + b.y) / 2
+    mid.z = (a.z + b.z) / 2
+    return mid
+
+def get_vector(a, b, c):
     ba = np.array([a.x - b.x, a.y - b.y, a.z - b.z])
     bc = np.array([c.x - b.x, c.y - b.y, c.z - b.z])
-    
+    return ba, bc
 
+def angle_between_points(a, b, c):
+    ba, bc = get_vector(a, b, c)
     dot = np.dot(ba, bc) # 內積(distance_ba * distance_bc * cos0)
     distance_ba = np.linalg.norm(ba)
     distance_bc = np.linalg.norm(bc)
@@ -23,19 +35,17 @@ def angle_between_points(a, b, c):
     angel_deg = np.degrees(angle_rad) # 將弧度轉為度數
     return angel_deg
 
-def main(cap):
+def main(cam):
 
-    ret, frame = cap.read()
+    ret, frame = cam.read()
     if not ret:
         print("Read Error")
         exit()
-
-    preview = frame.copy()       
-    rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+    frame = cv2.flip(frame, 1) #矩陣左右翻轉   ******
+    rgbframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = pose.process(rgbframe) # 從影像增測姿勢    
 
     if results.pose_world_landmarks:
-        # mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
         # Hand
         wrist_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST]
         wrist_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]
@@ -49,30 +59,24 @@ def main(cap):
         knee_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_KNEE]
         hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
         knee_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_KNEE]
-        ankle_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE]
-        ankle_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
+        hip_middle = get_mid_point(hip_left, hip_right)
 
-        #print( knee_left[0] )
-        # 计算角度
         angle_left_hand = angle_between_points(wrist_left, elbow_left, shoulder_left)
         angle_right_hand = angle_between_points(wrist_right, elbow_right, shoulder_right)
-        angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
-        angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
+        angle_left_leg = angle_between_points(hip_left, knee_left, hip_middle)
+        angle_right_leg = angle_between_points(hip_right, knee_right, hip_middle)
+        angle_two_leg = angle_between_points(knee_left, hip_middle, knee_right)
 
-        
-        # print( "RecognitionAttack\nleft_knee: ", angle_left_knee, "right_knee: ", angle_right_knee )      
-        if (angle_left_knee >= 90 and angle_left_knee <= 120) and \
-        (angle_right_knee >= 90 and angle_right_knee <= 120) and \
-        (angle_left_hand <= 180 and angle_left_hand >= 150) and (angle_right_hand <= 180 and angle_right_hand >= 150): # 綠色 標準動作
+        # GREEN
+        if (angle_left_leg >= 15 and angle_left_leg <= 18) and (angle_right_leg >= 15 and angle_right_leg <= 18) and  (angle_two_leg >= 50 and angle_two_leg <= 120) and (angle_left_hand <= 165 and angle_left_hand >= 150) and (angle_right_hand <= 165 and angle_right_hand >= 150): 
             return 1
-              
-        elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and \
-             (( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色
+        # YELLOW   
+        elif (angle_left_leg >= 10 and angle_left_leg < 14) and (angle_right_leg >= 10 and angle_right_leg < 14) and  (angle_two_leg >= 50 and angle_two_leg <= 120) and (angle_left_hand < 150 and angle_left_hand >= 135) and (angle_right_hand < 150 and angle_right_hand >= 135): # 黃色
             return 2
-        
+        # RED
         else:
             return 3
-        
+
 
 if __name__ == '__main__':
     main()
