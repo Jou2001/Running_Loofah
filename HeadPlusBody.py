@@ -26,7 +26,7 @@ def CompositePicture(input_head, input_body, path_output, index, minify):
     widthA , heightA = img_head.size
     new_img_head  = img_head.resize((int(widthA*minify[0]),int(heightA*minify[0])), Image.LANCZOS)
     new_img_body  = img_body.resize(img_body.size,Image.LANCZOS)
-    new_img_head = new_img_head.rotate(10)  
+    new_img_head = new_img_head.rotate(minify[3])  
     
     resultPicture = Image.new('RGBA', img_body.size, (0, 0, 0, 0))   
 
@@ -92,7 +92,7 @@ def Photograph(screen, fps, timer, cam):
  
     white = 255 - np.zeros((h,w,4), dtype='uint8')
 
-    cv2.circle(img, (int(w*0.5), int(h*0.5)), 121, 255, 5)
+    # cv2.circle(img, (int(w*0.5), int(h*0.5)), 121, 255, 5)
     x1, y1, x2, y2 = [int(w*0.5)+120, int(h*0.5)+120, int(w*0.5)-120, int(h*0.5)-120 ]
 
 
@@ -124,6 +124,7 @@ def Photograph(screen, fps, timer, cam):
     screen.blit(Merge.takephoto, (0,0))
     Merge.draw_text( screen, 'running loofah', 65, WIDTH/2, HEIGHT/10 )
     Merge.draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
+    Merge.draw_text( screen, 'please raise your hand', 30, WIDTH/2, HEIGHT/5+30 )
     if str(int(sec)) != "0" :
       Merge.draw_text( screen, str(int(sec)), 200, WIDTH/2, HEIGHT/5 )   
 
@@ -137,11 +138,12 @@ def Photograph(screen, fps, timer, cam):
       #  if a == 0 and sec == 0:
       #    a = 1
       #    sec = 4  # 加入倒數秒數
-          
-    if mode_next == 1 :
+
+    key_pressed = pygame.key.get_pressed()
+    if mode_next == 1 or key_pressed[pygame.K_DOWN]:
       if a == 0 and sec == 0:
         a = 1
-        sec = 4  # 加入倒數秒數      
+        sec = 4  # 加入倒數秒數             
 
   pygame.mixer.music.fadeout(4)
   camera_mp3.play()
@@ -157,22 +159,25 @@ def Photograph(screen, fps, timer, cam):
   path_output_RUN = "./picture/player/RUN_"
   for i in range(16):
     RunArr.append('./img/player'+ str(i+1) + '.png' )
-  minify = [0.75, 90, 40]
+  minify = [0.75, 90, 40, 10] # 縮放 x軸 y軸 旋轉
   for i in range(16):
     if ( not CompositePicture(head,  RunArr[i], path_output_RUN, i+1, minify ) ) :
        return False
 
+
+
   #healthState_head 
-  minify = [0.6, 40, 50]
+  minify = [0.6, 25, 50, 10]
   img_HeathHead = "./img/healthstate_head.png"
   path_output_HeathHead = "./picture/player/HEALTHHEAD_"
   if ( not CompositePicture(head,  img_HeathHead, path_output_HeathHead, 1, minify ) ):
       return False
   
+
   # slip
   img_slip = "./img/player_slip.png" 
   img_slip_output = "./picture/player/player_slip_" 
-  minify = [0.75, 80, 40]
+  minify = [0.75, 80, 25, 90]
   if ( not CompositePicture(head,  img_slip, img_slip_output, 1, minify ) ) :
      return False
 
