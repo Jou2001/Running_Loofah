@@ -55,7 +55,7 @@ def main(cap):
 
 
         if ( (angle_left_hand <= 180 and angle_left_hand >= 150 ) and (angle_left_shoulder <= 180 and angle_left_shoulder >= 150 ) ) or \
-           ( (angle_left_hand <= 180 and angle_left_hand >= 150 ) and (angle_left_shoulder <= 180 and angle_left_shoulder >= 150 ) ) : # 綠色 標準動作
+           ( (angle_right_hand <= 180 and angle_right_hand >= 150 ) and (angle_right_shoulder <= 180 and angle_right_shoulder >= 150 ) ) : # 綠色 標準動作
             return 1
               
         else :
