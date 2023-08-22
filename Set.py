@@ -10,7 +10,8 @@ def Set1(time, all_sprites, obstacles, attackObstacles):
         New_JumpObstacle(all_sprites, obstacles)
     elif now == 21 or now == 18 or now == 15:
         New_SlideObstacle(all_sprites, obstacles)
-    elif now == 12 or now == 9 or now == 6:
+    #elif now == 10 or now == 7 or now == 4:
+    elif now <= 10:
         New_AttackObstacle(all_sprites, obstacles, attackObstacles)
 
 
@@ -39,7 +40,6 @@ def Set3(time, all_sprites, obstacles, attackObstacles):
     elif now == 9 or now == 6 or now == 3:
         New_SlideObstacle(all_sprites, obstacles)
         
-
 
 # 攻擊（後跨步蹲抬手）：2秒（重複三次）
 # 趴下（左右跨步蹲）：2秒（重複三次）
