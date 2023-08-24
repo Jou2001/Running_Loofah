@@ -41,10 +41,6 @@ def Set3(time, all_sprites, obstacles, attackObstacles):
         New_SlideObstacle(all_sprites, obstacles)
         
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
 # 攻擊（後跨步蹲抬手）：2秒（重複三次）
 # 趴下（左右跨步蹲）：2秒（重複三次）
 # 跳起（深蹲）：3秒（重複三次）
