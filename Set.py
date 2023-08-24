@@ -7,11 +7,11 @@ from Obstacle import New_AttackObstacle, New_JumpObstacle, New_SlideObstacle
 def Set1(time, all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up):
     now = time % 30
     if now == 0 or now == 27 or now == 24:
-        #New_JumpObstacle(all_sprites, obstacles)
-        New_AttackObstacle(all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
+        New_JumpObstacle(all_sprites, obstacles)
+        # New_AttackObstacle(all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
     elif now == 21 or now == 18 or now == 15:
-        #New_SlideObstacle(all_sprites, obstacles)
-        New_AttackObstacle(all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
+        New_SlideObstacle(all_sprites, obstacles)
+        # New_AttackObstacle(all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
     #elif now == 10 or now == 7 or now == 4:
     elif now <= 10:
         New_AttackObstacle(all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
