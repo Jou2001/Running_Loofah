@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 在某一天，火星撞擊地球，
 一顆絲瓜因此長出手腳，
 開始奔跑起來，
@@ -8,15 +7,4 @@ In a cataclysmic event, Mars collided with Earth,
 Transforming a loofah with hands and feet,
 It races frantically,
 Help the loofah escape mutant creatures,
-=======
-在某一天，火星撞擊地球，
-一顆絲瓜因此長出手腳，
-開始奔跑起來，
-請協助絲瓜逃離變種生物的掌控，
-勇往直前吧!！
-In a cataclysmic event, Mars collided with Earth,
-Transforming a loofah with hands and feet,
-It races frantically,
-Help the loofah escape mutant creatures,
->>>>>>> origin/master
 Go all out!
