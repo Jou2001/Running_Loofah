@@ -607,10 +607,8 @@ class Sun(pygame.sprite.Sprite) :
         self.img_ori = sun
         self.image = self.img_ori
         self.rect = self.image.get_rect()
-        self.rect.x = 720 # 960
-        self.rect.y = 50
-        self.speed_X = 10
-        self.rot_degree = 5
+        self.rect.center = (730, 80) # 960
+        self.rot_degree = 2
         self.total_degree = 0  
 
     def update(self) :
@@ -620,6 +618,8 @@ class Sun(pygame.sprite.Sprite) :
         self.total_degree += self.rot_degree
         self.total_degree = self.total_degree % 360
         self.image = pygame.transform.rotate( self.img_ori, self.total_degree )
+        self.rect = self.image.get_rect()
+        self.rect.center = (730, 60) # 960
 
 
 def draw_health(surf, hp, x, y ):
@@ -670,6 +670,9 @@ def run():
       # draw_start()
       # draw_intro()
 
+      o = Sun()
+      back_sprites.add(o)
+
       while running :       
           # get input
           timer.tick(fps)
@@ -699,9 +702,6 @@ def run():
                 ground02 = Ground()
                 ground02.rect.x = WIDTH
                 all_sprites.add(ground02)
-
-                o = Sun()
-                back_sprites.add(o)
 
                 count = random.randrange( 1, 3 )
                 for i in range( 0, count ) :
