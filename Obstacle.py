@@ -24,12 +24,15 @@ class Jump_Obstacle(pygame.sprite.Sprite) : # 4.球 408*408
         self.rect.x -= self.speed_X
         if self.rect.right < 0:
             self.kill()
+
+        if self.rect.x < 420 and self.rect.x > 150:
+            Merge.show_hint("jump")
     
     def rotate(self) :
         self.total_degree += self.rot_degree
         self.total_degree = self.total_degree % 360
         self.image = pygame.transform.rotate( self.img_ori, self.total_degree )
-
+        
 class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*303
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
@@ -46,6 +49,9 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
         self.rect.x -= self.speed_X
         if self.rect.right < 0:
             self.kill()
+
+        if self.rect.x < 420 and self.rect.x > 150:
+            Merge.show_hint("attack")
 
 class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
     def __init__(self) :
@@ -76,6 +82,9 @@ class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
 
         if self.rect.right < 0:
             self.kill()
+
+        if self.rect.x < 420 and self.rect.x > 150:
+            Merge.show_hint("slip")
 
 def New_JumpObstacle(all_sprites, obstacles) :
     o = Jump_Obstacle()

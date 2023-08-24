@@ -126,7 +126,7 @@ good_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Good.mp3"))
 
 load_image = []
 player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha()
-healthstate_head = pygame.image.load(os.path.join("img", "healthstate_head.png")).convert_alpha()
+state_head = pygame.image.load(os.path.join("img", "healthstate_head.png")).convert_alpha()
 # load into txt
 fout_txt = os.path.join( "Handwriting.ttf" )
 
@@ -143,7 +143,6 @@ for i in range(0, 4) :
     if i+1 == 4 :
         image = pygame.transform.scale( image, (204, 204) ) # 球 408*408
     obstacle.append( image )
-
 
 
 def ReadVideo(videoName, txt, txtSize) :
@@ -322,8 +321,7 @@ def draw_intro() :
         else :
             draw_text( screen, "Bad!" , 50, WIDTH/2, BAR_HEIGHT + 100 )
             pygame.display.update()
-        
-    
+          
 def draw_init() :
     global player_slip_img, healthstate_head, load_image, cap
     screen.blit(background1_img, (0,0))
@@ -613,6 +611,19 @@ def draw_health(surf, hp, x, y ):
 
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
+def show_hint(action):
+    if action == "attack":
+        attack_action = pygame.transform.scale( intro_attack, (42, 68) ) # 420*680
+        screen.blit(attack_action, (145,60))
+        draw_text( screen, "Attack!", 50, 95, 60 )
+    elif action == "slip":
+        slip_action = pygame.transform.scale( intro_slip_1, (56, 30) ) # 560*300
+        screen.blit(slip_action, (135,60))
+        draw_text( screen, "Slip!", 50, 80, 60 )
+    elif action == "jump":
+        jump_action = pygame.transform.scale( intro_jump, (50, 70) ) # 340*590
+        screen.blit(jump_action, (135,60))
+        draw_text( screen, "Jump!", 50, 80, 60 )
 
 def run():
     global cap, all_sprites, attackObstacles
@@ -710,8 +721,8 @@ def run():
                   #if time % 30 == 0:
                       #func = random.choice(functions)
                   #func(time, all_sprites, obstacles)
-                  Set.Set1(time, all_sprites, obstacles, attackObstacles)
-
+                Set.Set1(time, all_sprites, obstacles, attackObstacles)
+                
               # update game
               back_sprites.update()
               all_sprites.update()
@@ -733,6 +744,7 @@ def run():
               #screen.blit(frame, ( 0, 500 ) )
               draw_health(screen, player.health, 60, 32 )
               screen.blit(healthstate_head, (10,10))
+              
               
               # timer
               time, past = times_2(time, past, player)
@@ -789,7 +801,7 @@ def run():
                   win_mp4.preview()
                   show_init = True
 
-              pygame.display.update()
+            #   pygame.display.update()
 
       pygame.quit()
 
