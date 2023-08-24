@@ -25,6 +25,8 @@ all_sprites = pygame.sprite.Group()
 back_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 attackObstacles = pygame.sprite.Group()
+attackObstacles_down = pygame.sprite.Group()
+attackObstacles_up = pygame.sprite.LayeredUpdates()
 
 cap = []
 # initial
@@ -40,80 +42,80 @@ GREEN = (101,221,146) # 65DD92
 YELLO = (248,218,110) # F8DA6E
 RED = (248,141,110) # F88D6E
 # define screen size
-WIDTH = 960
-HEIGHT = 600
+COMMOM_R = 0.5
+WIDTH = 1920*COMMOM_R
+HEIGHT = 1200*COMMOM_R
 # define player initial position
 PLAYER_Y = 270
 #define player continuous jump time
 PLAYER_JUMP = 2
 PLAYER_DOWN = 2
 PLAYER_ATTACK = 2
-gravity = 5
+gravity = 10*COMMOM_R
 # define player health
 HEALTH = 100
 # define health size
-BAR_LENGTH = 200
-BAR_HEIGHT = 20
+BAR_LENGTH = 400*COMMOM_R
+BAR_HEIGHT = 40*COMMOM_R
 # define speed
-fps = 60 # 每秒60幀 
+fps = 100 # 每秒60幀 
 # define time
 timer = pygame.time.Clock()
-
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT)) # create screen
 pygame.display.set_caption('Running loofah') # 開始前標題
 # load into picture
 ground_img = pygame.image.load(os.path.join("img", "ground01.png")).convert_alpha()
-ground_img = pygame.transform.scale( ground_img, (960, 203) )
+ground_img = pygame.transform.scale( ground_img, (1920*COMMOM_R, 406*COMMOM_R) ) 
 background1_img = pygame.image.load(os.path.join("img", "background01.png")).convert()
-background1_img = pygame.transform.scale( background1_img, (960, 600) )
+background1_img = pygame.transform.scale( background1_img, (1920*COMMOM_R, 1200*COMMOM_R) )
 background2_img = pygame.image.load(os.path.join("img", "background02.png")).convert()
-background2_img = pygame.transform.scale( background2_img, (960, 600) )
+background2_img = pygame.transform.scale( background2_img, (1920*COMMOM_R, 1200*COMMOM_R) )
 background3_img = pygame.image.load(os.path.join("img", "background03.png")).convert()
-background3_img = pygame.transform.scale( background3_img, (960, 600) )
+background3_img = pygame.transform.scale( background3_img, (1920*COMMOM_R, 1200*COMMOM_R) )
 background4_img = pygame.image.load(os.path.join("img", "background04.png")).convert()
-background4_img = pygame.transform.scale( background4_img, (960, 600) )
+background4_img = pygame.transform.scale( background4_img, (1920*COMMOM_R, 1200*COMMOM_R) )
 
 takephoto = pygame.image.load(os.path.join("img", "takephoto.png")).convert_alpha()
-takephoto = pygame.transform.scale( takephoto, (WIDTH, HEIGHT) )
+takephoto = pygame.transform.scale( takephoto, (1920*COMMOM_R, 1200*COMMOM_R) )
 
 intro_attack = pygame.image.load(os.path.join("img", "intro_attack.png")).convert_alpha()
-intro_attack = pygame.transform.scale( intro_attack, (210, 340) ) # 420*680
+intro_attack = pygame.transform.scale( intro_attack, (420*COMMOM_R, 680*COMMOM_R) ) # 420*680
 intro_jump = pygame.image.load(os.path.join("img", "intro_jump.png")).convert_alpha()
-intro_jump = pygame.transform.scale( intro_jump, (170, 295) ) # 340*590
+intro_jump = pygame.transform.scale( intro_jump, (340*COMMOM_R, 590*COMMOM_R) ) # 340*590
 intro_slip_1 = pygame.image.load(os.path.join("img", "intro_slip_1.png")).convert_alpha()
-intro_slip_1 = pygame.transform.scale( intro_slip_1, (280, 300) ) # 560*300
+intro_slip_1 = pygame.transform.scale( intro_slip_1, (560*COMMOM_R, 600*COMMOM_R) ) # 560*600
 intro_slip_2 = pygame.image.load(os.path.join("img", "intro_slip_2.png")).convert_alpha()
-intro_slip_2 = pygame.transform.scale( intro_slip_2, (280, 300) ) # 560*300
+intro_slip_2 = pygame.transform.scale( intro_slip_2, (560*COMMOM_R, 600*COMMOM_R) ) # 560*600
 intro_handup_left = pygame.image.load(os.path.join("img", "intro_handup_left.png")).convert_alpha()
-intro_handup_left = pygame.transform.scale( intro_handup_left, (234, 334) ) # 468*668
+intro_handup_left = pygame.transform.scale( intro_handup_left, (468*COMMOM_R, 668*COMMOM_R) ) # 468*668
 intro_handup_right = pygame.image.load(os.path.join("img", "intro_handup_right.png")).convert_alpha()
-intro_handup_right = pygame.transform.scale( intro_handup_right, (234, 334) ) # 468*668
+intro_handup_right = pygame.transform.scale( intro_handup_right, (468*COMMOM_R, 668*COMMOM_R) ) # 468*668
 
 bullet = pygame.image.load(os.path.join("img", "bullet.png")).convert_alpha()
-bullet = pygame.transform.scale( bullet, (50, 57) )
+bullet = pygame.transform.scale( bullet, (912*COMMOM_R*0.11, 1032*COMMOM_R*0.11) ) # 912*1032 /18
 
 cloud = []
 for i in range(0, 3) :
     image = pygame.image.load(os.path.join("img", "cloud0" + str(i+1) + ".png")).convert_alpha()
     if i+1 == 1:
-        image = pygame.transform.scale( image, (174, 99) ) # 348*178
+        image = pygame.transform.scale( image, (348*COMMOM_R, 178*COMMOM_R) ) # 348*178
     if i+1 == 2:
-        image = pygame.transform.scale( image, (109, 79) ) # 218*158
+        image = pygame.transform.scale( image, (218*COMMOM_R, 158*COMMOM_R) ) # 218*158
     if i+1 == 3 :
-        image = pygame.transform.scale( image, (179, 104) ) # 358*208
+        image = pygame.transform.scale( image, (358*COMMOM_R, 208*COMMOM_R) ) # 358*208
     cloud.append( image )
 
 tree = []
 image = pygame.image.load(os.path.join("img", "grove.png")).convert_alpha()
-image = pygame.transform.scale( image, (319, 239) ) # 638*478
+image = pygame.transform.scale( image, (638*COMMOM_R, 478*COMMOM_R) ) # 638*478
 tree.append( image )
 image = pygame.image.load(os.path.join("img", "tree.png")).convert_alpha()
-image = pygame.transform.scale( image, (244, 424) ) # 488*848
+image = pygame.transform.scale( image, (448*COMMOM_R, 848*COMMOM_R) ) # 488*848
 tree.append( image )
 
 sun = pygame.image.load(os.path.join("img", "sun.png")).convert_alpha()
-sun = pygame.transform.scale( sun, (100, 100) ) # 200*200
+sun = pygame.transform.scale( sun, (200*COMMOM_R, 200*COMMOM_R) ) # 200*200
 
 #load mp4
 do_the_following_mp4 = VideoFileClip(os.path.join("video", "do_the_following.mp4")).resize((960,600))
@@ -135,19 +137,23 @@ fout_txt = os.path.join( "Handwriting.ttf" )
 
 
 obstacle = []
-for i in range(0, 4) :
+for i in range(0, 7) :
     image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
     if i+1 == 1:
-        image = pygame.transform.scale( image, (101, 140) ) # 蟲蟲 202*279
-    if i+1 == 2:
-        image = pygame.transform.scale( image, (140, 151) ) # 老鼠 281*303
-    if i+1 == 3 :
-        image = pygame.transform.scale( image, (300, 300) ) # 飛天雞 2048*2048
-    if i+1 == 4 :
-        image = pygame.transform.scale( image, (204, 204) ) # 球 408*408
+        image = pygame.transform.scale( image, (202*COMMOM_R, 279*COMMOM_R) ) # 蟲蟲 202*279
+    elif i+1 == 2:
+        image = pygame.transform.scale( image, (281*COMMOM_R, 303*COMMOM_R) ) # 老鼠 281*303
+    elif i+1 == 3 :
+        image = pygame.transform.scale( image, (2048*COMMOM_R*0.25, 2048*COMMOM_R*0.25) ) # 飛天雞 2048*2048
+    elif i+1 == 4 :
+        image = pygame.transform.scale( image, (408*COMMOM_R, 408*COMMOM_R) ) # 球 408*408
+    elif i+1 == 5 or 6 or 7 :
+        if i+1 == 6 :
+            image01 = image.copy()
+        image = pygame.transform.scale( image, (820*COMMOM_R*0.665, 570*COMMOM_R*0.665) ) # 野豬 820*570 
     obstacle.append( image )
-
-
+image = pygame.transform.scale( image01, (820*COMMOM_R*0.665*0.7, 570*COMMOM_R*0.665*0.7) ) # 野豬 820*570 /3 *0.7
+obstacle.append( image )
 
 def ReadVideo(videoName, txt, txtSize) :
     video = cv2.VideoCapture(videoName)
@@ -359,13 +365,13 @@ def draw_init() :
     load_image = []
     for i in range( 16 ) :
       image = pygame.image.load(os.path.join("picture", "player" , "RUN_" + str(i+1) + ".png")).convert_alpha()
-      image = pygame.transform.scale( image, (178, 215) )
+      image = pygame.transform.scale( image, (359*COMMOM_R, 433*COMMOM_R) ) # 359*433
       load_image.append( image )
       
     player_slip_img = pygame.image.load(os.path.join("picture", "player", "player_slip_1.png")).convert_alpha()
-    player_slip_img = pygame.transform.scale( player_slip_img, (235, 128) )
+    player_slip_img = pygame.transform.scale( player_slip_img, (470*COMMOM_R, 256*COMMOM_R) ) # 470*256
     healthstate_head = pygame.image.load(os.path.join("picture","player" , "HEALTHHEAD_1.png")).convert_alpha()
-    healthstate_head = pygame.transform.scale( healthstate_head, (58, 53) )
+    healthstate_head = pygame.transform.scale( healthstate_head, (200*COMMOM_R*0.58, 201*COMMOM_R*0.58) ) # 200*201
     # for i in range( 3 ) :
     #  image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
     #  obstacle.append( image )
@@ -522,7 +528,7 @@ class Player(pygame.sprite.Sprite) :
 
         if (self.mode_attack == 1 and self.countattack >= 0 and self.isGoodAttack >= 2) or \
            (key_pressed[pygame.K_LEFT]) :
-            bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+10))
+            bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+20))
             all_sprites.add(bullet)
             bullets.add(bullet)
             self.countattack = PLAYER_ATTACK
@@ -530,7 +536,7 @@ class Player(pygame.sprite.Sprite) :
         elif (self.countattack > 0 and (self.mode_attack == 1 and self.mode_attack == 2) ) or \
              (self.countattack > 0 and ( key_pressed[pygame.K_LEFT] ) ):
             self.countattack -= 1
-            bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+10))
+            bullet = Bullet(self.rect.right, ((self.rect.y+self.rect.bottom)/2+20))
             all_sprites.add(bullet)
             bullets.add(bullet)
 
@@ -621,7 +627,6 @@ class Sun(pygame.sprite.Sprite) :
         self.rect = self.image.get_rect()
         self.rect.center = (730, 60) # 960
 
-
 def draw_health(surf, hp, x, y ):
     if hp < 0:
       hp = 0
@@ -637,23 +642,9 @@ def draw_health(surf, hp, x, y ):
 
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
-def show_hint(action):
-    if action == "attack":
-        attack_action = pygame.transform.scale( intro_attack, (42, 68) ) # 420*680
-        screen.blit(attack_action, (145,60))
-        draw_text( screen, "Attack!", 50, 95, 60 )
-    elif action == "slip":
-        slip_action = pygame.transform.scale( intro_slip_1, (56, 30) ) # 560*300
-        screen.blit(slip_action, (135,60))
-        draw_text( screen, "Slip!", 50, 80, 60 )
-    elif action == "jump":
-        jump_action = pygame.transform.scale( intro_jump, (50, 70) ) # 340*590
-        screen.blit(jump_action, (135,60))
-        draw_text( screen, "Jump!", 50, 80, 60 )
-
 
 def run():
-    global cap, all_sprites, attackObstacles
+    global cap, all_sprites, attackObstacles, attackObstacles_down, attackObstacles_up
 
     show_init = True
     running = True
@@ -748,11 +739,10 @@ def run():
               
               if changeTime:
                   # 隨機選擇並調用一個函數
-                  if time % 30 == 0:
-                      func = random.choice(functions)
-                  func(time, all_sprites, obstacles, attackObstacles)
-                  
-                  # Set.Set1(time, all_sprites, obstacles, attackObstacles)
+                  #if time % 30 == 0:
+                      #func = random.choice(functions)
+                  #func(time, all_sprites, obstacles)
+                  Set.Set1(time, all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
 
               # update game
               back_sprites.update()
@@ -825,13 +815,20 @@ def run():
                   if player.health <= 0 :
                       lose_mp4.preview()
                       show_init = True
-    
-
+              
+              hits = pygame.sprite.groupcollide(attackObstacles_down, attackObstacles_up, False, False)
+              if len(attackObstacles_up) > len(hits) :
+                for i in range ( len(attackObstacles_up) - len(hits) )  :
+                    if attackObstacles_up.get_sprite(i).type == 2:
+                        attackObstacles_up.get_sprite(i).type = 3
+                        attackObstacles_up.get_sprite(i).size = 0.7
+                        attackObstacles_up.get_sprite(i).change_y = 0
+                  
               if time == 0 and  player.health > 0:
                   win_mp4.preview()
                   show_init = True
 
-            #   pygame.display.update()
+              pygame.display.update()
 
       pygame.quit()
 
