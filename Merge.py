@@ -748,10 +748,11 @@ def run():
               
               if changeTime:
                   # 隨機選擇並調用一個函數
-                  #if time % 30 == 0:
-                      #func = random.choice(functions)
-                  #func(time, all_sprites, obstacles)
-                  Set.Set1(time, all_sprites, obstacles, attackObstacles)
+                  if time % 30 == 0:
+                      func = random.choice(functions)
+                  func(time, all_sprites, obstacles, attackObstacles)
+                  
+                  # Set.Set1(time, all_sprites, obstacles, attackObstacles)
 
               # update game
               back_sprites.update()
