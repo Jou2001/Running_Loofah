@@ -82,7 +82,7 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
             self.size += 0.1
             if self.size >= 1 :
                 self.size = 1
-            print( "999999    ", self.size )
+            
 
             self.rect.bottom += 10
             if self.rect.bottom >= ATTACK_BOTTOM : # 480
