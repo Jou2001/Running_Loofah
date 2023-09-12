@@ -50,26 +50,37 @@ fps = 60 # 每秒60幀
 # define time
 timer = pygame.time.Clock()
 
+def MoviePlay( mp4 ) :
+    running = True
+    frames = mp4.iter_frames()
 
-obstacle = []
-for i in range(0, 7) :
-    image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
-    if i+1 == 1:
-        image = pygame.transform.scale( image, (202*Material.COMMOM_R, 279*Material.COMMOM_R) ) # 蟲蟲 202*279
-    elif i+1 == 2:
-        image = pygame.transform.scale( image, (281*Material.COMMOM_R, 303*Material.COMMOM_R) ) # 老鼠 281*303
-    elif i+1 == 3 :
-        image = pygame.transform.scale( image, (2048*Material.COMMOM_R*0.25, 2048*Material.COMMOM_R*0.25) ) # 飛天雞 2048*2048
-    elif i+1 == 4 :
-        image = pygame.transform.scale( image, (408*Material.COMMOM_R, 408*Material.COMMOM_R) ) # 球 408*408
-    elif i+1 == 5 or 6 or 7 :
-        if i+1 == 6 :
-            image01 = image.copy()
-        image = pygame.transform.scale( image, (820*Material.COMMOM_R*0.665, 570*Material.COMMOM_R*0.665) ) # 野豬 820*570 
-    obstacle.append( image )
-image = pygame.transform.scale( image01, (820*Material.COMMOM_R*0.665*0.7, 570*Material.COMMOM_R*0.665*0.7) ) # 野豬 820*570 /3 *0.7
-obstacle.append( image )
+    while running:
+        # 获取Pygame事件
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
+        # 获取下一帧电影
+        frame = next(frames, None)
+
+        if frame is None:
+            # 电影播放完毕，退出循环
+            running = False
+        else:
+            # 在Pygame窗口上顯示
+            frame = np.rot90(frame, 3, (1,0) )
+            pygame_frame = pygame.surfarray.make_surface(frame)
+            pygame_frame = pygame.transform.flip(pygame_frame, True, False)
+            screen.blit(pygame_frame, ((int((Material.S_WIDTH-Material.WIDTH)/2)), int((Material.S_HEIGHT-Material.HEIGHT)/2)))
+            #print(int((Material.S_WIDTH-Material.WIDTH)/2))
+            pygame.display.flip()
+            
+            timer.tick(fps)
+
+    # 释放资源
+    mp4.reader.close()
+
+'''
 def ReadVideo(videoName, txt, txtSize) :
     video = cv2.VideoCapture(videoName)
     video_fps = video.get(cv2.CAP_PROP_FPS)
@@ -92,6 +103,7 @@ def ReadVideo(videoName, txt, txtSize) :
         else : 
             break
 '''
+'''
 def draw_text( surf, text, size, x, y ) :
     font = pygame.font.Font( fout_txt, size )
     # font = pygame.font.SysFont( "arial", size )
@@ -101,6 +113,9 @@ def draw_text( surf, text, size, x, y ) :
     text_rect.top = y
     surf.blit( text_surface, text_rect )
 '''
+
+
+
 
 def draw_start() :
     global cap
@@ -119,13 +134,13 @@ def draw_start() :
         txt_line = [ "在某一天，火星撞擊地球，", "一顆絲瓜因此長出手腳，", "開始奔跑起來，", "請協助絲瓜逃離變種生物的掌控，", "勇往直前吧!!", "In a cataclysmic event, Mars collided with Earth,", \
                         "Transforming a loofah with hands and feet,", "It races frantically,", "Help the loofah escape mutant creatures,", "Go all out!"]
         count_line = int(Material.S_HEIGHT/10)
-        plus = int(40*Material.COMMOM_R_H)
+        # print(count_line)
         txt_size = int(40*Material.COMMOM_R_H)
-        Material.draw_text( screen, "INTRODUCE", 100*int(Material.COMMOM_R_H), int(Material.S_WIDTH/2), count_line ) # 60 
-        count_line = count_line + plus + 100*int(Material.COMMOM_R_H)
+        Material.draw_text( screen, "INTRODUCE", int(100*Material.COMMOM_R_H), int(Material.S_WIDTH/2), count_line ) # 60 
+        count_line = count_line + txt_size + int(100*Material.COMMOM_R_H)
         for txt in txt_line :
             Material.draw_text( screen, txt, txt_size, int(Material.S_WIDTH/2), count_line ) 
-            count_line = count_line + plus + txt_size
+            count_line = count_line + 2 * txt_size
 
         for event in pygame.event.get() :
           if event.type == pygame.QUIT :
@@ -133,13 +148,14 @@ def draw_start() :
 
         pygame.display.update()
 
+
 def draw_intro() :
     global cap
 
     #ReadVideo(do_the_following_mp4, "PLEASE DO THE FOLLOWING", 50)
-    screen.blit(Material.background1_img, (0,0))
-    pygame.display.update()
-    #Material.do_the_following_mp4.preview()
+    #Material.do_the_following_mp4.preview() 
+    MoviePlay( Material.do_the_following_mp4 )
+
    
     key_pressed = pygame.key.get_pressed()
     time = 0
@@ -169,8 +185,8 @@ def draw_intro() :
         screen.blit(Material.background1_img, (0,0))
 
         if active == 1 :
-            screen.blit(Material.intro_jump, (200*int(Material.COMMOM_R_W),400*int(Material.COMMOM_R_H)))
-            Material.draw_text( screen, "HOW TO JUMP", 100*int(Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5 ) # 60
+            screen.blit(Material.intro_jump, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
+            Material.draw_text( screen, "HOW TO JUMP", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
         elif active == 2 :
             screen.blit(Material.intro_slip_1, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
             Material.draw_text( screen, "HOW TO SLIP No.1", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
@@ -226,7 +242,7 @@ def draw_intro() :
         else :
             Material.draw_text( screen, "Bad!" , int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(200*Material.COMMOM_R) )
             pygame.display.update()
-        
+         
     
 def draw_init() :
     global cap
@@ -254,9 +270,8 @@ def draw_init() :
     pygame.display.update()
     faceOK = HeadPlusBody.Photograph( screen, fps, timer, cap ) 
 
-    screen.blit(Material.background1_img, (0,0))
-    pygame.display.update()
-    #Material.start321_mp4.preview()
+
+    MoviePlay( Material.start321_mp4 ) 
 
     Material.load_image = []
     for i in range( 16 ) :
@@ -264,10 +279,10 @@ def draw_init() :
       image = pygame.transform.scale( image, (359*Material.COMMOM_R, 433*Material.COMMOM_R) ) # 359*433
       Material.load_image.append( image )
       
-    player_slip_img = pygame.image.load(os.path.join("picture", "player", "player_slip_1.png")).convert_alpha()
-    player_slip_img = pygame.transform.scale( player_slip_img, (470*Material.COMMOM_R, 256*Material.COMMOM_R) ) # 470*256
-    healthstate_head = pygame.image.load(os.path.join("picture","player" , "HEALTHHEAD_1.png")).convert_alpha()
-    healthstate_head = pygame.transform.scale( healthstate_head, (200*Material.COMMOM_R*0.58, 201*Material.COMMOM_R*0.58) ) # 200*201
+    Material.player_slip_img = pygame.image.load(os.path.join("picture", "player", "player_slip_1.png")).convert_alpha()
+    Material.player_slip_img = pygame.transform.scale( Material.player_slip_img, (470*Material.COMMOM_R, 256*Material.COMMOM_R) ) # 470*256
+    Material.healthstate_head = pygame.image.load(os.path.join("picture","player" , "HEALTHHEAD_1.png")).convert_alpha()
+    Material.healthstate_head = pygame.transform.scale( Material.healthstate_head, (200*Material.COMMOM_R*0.65, 201*Material.COMMOM_R*0.65) ) # 200*201
 
 
 def times_1(time, past) :
@@ -291,7 +306,7 @@ def times_2(time, past, player) :
     return time, past
 
 class Player(pygame.sprite.Sprite) :
-    global cap, jump_mp3, all_sprites
+    global cap, all_sprites
 
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
@@ -355,7 +370,7 @@ class Player(pygame.sprite.Sprite) :
         if (self.mode_jump == 1 and self.change_y == 0 and self.countJump >= 0 and self.isGoodJump >= 2) or \
            (key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0) : # key_pressed[pygame.K_RIGHT]
             if self.rect.y == Material.PLAYER_Y :
-              jump_mp3.play()   
+              Material.jump_mp3.play()   
 
             self.change_y = 60
             self.countJump = Material.PLAYER_JUMP
@@ -470,7 +485,8 @@ class Ground(pygame.sprite.Sprite) :
     def update(self) :
         self.rect.x -= self.speed_X
         if self.rect.right <= 0 :
-            self.rect.x = int((Material.GROUND_NUM-1)*420*Material.COMMOM_R)
+            self.rect.x = (Material.GROUND_NUM-1)*(int(420*Material.COMMOM_R)) + self.rect.right
+            print("self.rect.x ", self.rect.x)
 
 class Cloud(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -588,6 +604,8 @@ def run():
                     ground.rect.x = ground.rect.x + total_len
                     all_sprites.add(ground)
                     total_len = total_len + int(420*Material.COMMOM_R)
+                    if i == Material.GROUND_NUM - 2 :
+                      print(total_len)
 
                 count = random.randrange( 1, 3 )
                 for i in range( 0, count ) :
@@ -624,7 +642,7 @@ def run():
               rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
               results = pose.process(rgbframe) # 從影像增測姿勢  
               mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-              preview = cv2.resize(preview, (300*Material.COMMOM_R, 200*Material.COMMOM_R))
+              preview = cv2.resize(preview, (int(300*Material.COMMOM_R), int(200*Material.COMMOM_R)))
               preview = np.rot90(preview)
               preview = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
               preview = pygame.surfarray.make_surface(preview) 
@@ -708,7 +726,9 @@ def run():
               for hit in hits :               
                   player.health -= hit.energy
                   if player.health <= 0 :
-                      Material.lose_mp4.preview()
+                      screen.blit(Material.background1_img, (0,0))
+                      pygame.display.update()   
+                      MoviePlay( Material.lose_mp4 )
                       show_init = True
               
               hits = pygame.sprite.groupcollide(attackObstacles_down, attackObstacles_up, False, False)
@@ -720,7 +740,9 @@ def run():
                         attackObstacles_up.get_sprite(i).change_y = 0
                   
               if time == 0 and  player.health > 0:
-                  Material.win_mp4.preview()
+                  screen.blit(Material.background1_img, (0,0))
+                  pygame.display.update()   
+                  MoviePlay( Material.win_mp4 ) 
                   show_init = True
 
               pygame.display.update()

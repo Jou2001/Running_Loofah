@@ -52,7 +52,7 @@ background3_img = pygame.transform.scale( background3_img, (1920*COMMOM_R, 1200*
 background4_img = pygame.image.load(os.path.join("img", "background04.png")).convert()
 background4_img = pygame.transform.scale( background4_img, (S_WIDTH, S_HEIGHT) )
 
-GROUND_NUM = math.ceil(S_WIDTH / int(420.0*COMMOM_R)) + 1
+GROUND_NUM = math.ceil(S_WIDTH / int(420*COMMOM_R)) + 1
 ground_img = []
 for i in range(0, 5) :
     image = pygame.image.load(os.path.join("img", "ground_" + str(i+1) + ".png")).convert_alpha()
@@ -117,6 +117,25 @@ player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).conv
 healthstate_head = pygame.image.load(os.path.join("img", "healthstate_head.png")).convert_alpha() # 200*201
 
 
+obstacle = []
+for i in range(0, 7) :
+    image = pygame.image.load(os.path.join("img", "obstacle" + str(i+1) + ".png")).convert_alpha()
+    if i+1 == 1:
+        image = pygame.transform.scale( image, (202*COMMOM_R, 279*COMMOM_R) ) # 蟲蟲 202*279
+    elif i+1 == 2:
+        image = pygame.transform.scale( image, (281*COMMOM_R, 303*COMMOM_R) ) # 老鼠 281*303
+    elif i+1 == 3 :
+        image = pygame.transform.scale( image, (2048*COMMOM_R*0.25, 2048*COMMOM_R*0.25) ) # 飛天雞 2048*2048
+    elif i+1 == 4 :
+        image = pygame.transform.scale( image, (408*COMMOM_R, 408*COMMOM_R) ) # 球 408*408
+    elif i+1 == 5 or 6 or 7 :
+        if i+1 == 6 :
+            image01 = image.copy()
+        image = pygame.transform.scale( image, (820*COMMOM_R*0.665, 570*COMMOM_R*0.665) ) # 野豬 820*570 
+    obstacle.append( image )
+image = pygame.transform.scale( image01, (820*COMMOM_R*0.665*0.7, 570*COMMOM_R*0.665*0.7) ) # 野豬 820*570 /3 *0.7
+obstacle.append( image )
+
 # load into txt
 fout_txt = os.path.join( "Handwriting.ttf" )
 
@@ -128,3 +147,4 @@ def draw_text( surf, text, size, x, y ) :
     text_rect.centerx = x
     text_rect.top = y
     surf.blit( text_surface, text_rect )
+

@@ -20,7 +20,7 @@ def CompositePicture(input_head, input_body, path_output, index, minify):
 
     widthB , heightB = img_body.size
     widthA , heightA = img_head.size
-    new_img_head  = img_head.resize((int(widthA*minify[0]),int(heightA*minify[0])), Image.LANCZOS)
+    new_img_head  = img_head.resize((int((widthA/(Material.COMMOM_R*2))*minify[0]),int((heightA/(Material.COMMOM_R*2))*minify[0])), Image.LANCZOS)
     new_img_body  = img_body.resize(img_body.size,Image.LANCZOS)
     new_img_head = new_img_head.rotate(minify[3])  
     
@@ -87,8 +87,8 @@ def Photograph(screen, fps, timer, cam):
     h = int(img.shape[0])      
     white = 255 - np.zeros((h,w,4), dtype='uint8')
 
-    # cv2.circle(img, (int(w*0.5), int(h*0.5)), 121, 255, 5)
-    x1, y1, x2, y2 = [(int(w*0.5)+120)*Material.COMMOM_R, (int(h*0.5)+120)*Material.COMMOM_R, (int(w*0.5)-120)*Material.COMMOM_R, (int(h*0.5)-120)*Material.COMMOM_R ]
+    #cv2.circle(img, (int(w*0.5), int(h*0.5)), int(240*Material.COMMOM_R), 255, 5)
+    x1, y1, x2, y2 = [(int(w*0.5)+240*Material.COMMOM_R), (int(h*0.5)+240*Material.COMMOM_R), (int(w*0.5)-240*Material.COMMOM_R), (int(h*0.5)-240*Material.COMMOM_R) ]
 
 
     mode_next = RecongnitionNext.main(cam)
@@ -106,7 +106,7 @@ def Photograph(screen, fps, timer, cam):
             if a < 0:
                 a = 0
                 # 裁切圖片
-                photo = photo[int(y2+5*Material.COMMOM_R):int(y1-5*Material.COMMOM_R), int(x2+5*Material.COMMOM_R):int(x1-5*Material.COMMOM_R)]
+                photo = photo[int(y2):int(y1), int(x2):int(x1)]
 
                 cv2.imwrite( path_input + '/head_body/head.jpg', cv2.flip(photo, 1))
                 break
@@ -154,7 +154,8 @@ def Photograph(screen, fps, timer, cam):
   path_output_RUN = "./picture/player/RUN_"
   for i in range(16):
     RunArr.append('./img/player'+ str(i+1) + '.png' )
-  minify = [0.75/Material.COMMOM_R, 90, 40, 10] # 縮放 x軸 y軸 旋轉
+  minify = [0.75, 90, 40, 10] # 縮放 x軸 y軸 旋轉
+  print(0.75*Material.COMMOM_R, Material.COMMOM_R)
   for i in range(16):
     if ( not CompositePicture(head,  RunArr[i], path_output_RUN, i+1, minify ) ) :
        return False
@@ -162,7 +163,7 @@ def Photograph(screen, fps, timer, cam):
 
 
   #healthState_head 
-  minify = [0.6/Material.COMMOM_R, 25, 50, 10]
+  minify = [0.6, 25, 50, 10]
   img_HeathHead = "./img/healthstate_head.png"
   path_output_HeathHead = "./picture/player/HEALTHHEAD_"
   if ( not CompositePicture(head,  img_HeathHead, path_output_HeathHead, 1, minify ) ):
@@ -172,7 +173,7 @@ def Photograph(screen, fps, timer, cam):
   # slip
   img_slip = "./img/player_slip.png" 
   img_slip_output = "./picture/player/player_slip_" 
-  minify = [0.75/Material.COMMOM_R, 80, 25, 90]
+  minify = [0.75, 80, 25, 90]
   if ( not CompositePicture(head,  img_slip, img_slip_output, 1, minify ) ) :
      return False
 
