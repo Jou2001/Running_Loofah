@@ -18,7 +18,6 @@ class Jump_Obstacle(pygame.sprite.Sprite) : # 4.球 408*408
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
         self.speed_X = 15
-        self.radius = 200*Material.COMMOM_R
         self.img_ori = Material.obstacle[BALL]
         self.image = self.img_ori.copy()
         self.rect = self.image.get_rect()

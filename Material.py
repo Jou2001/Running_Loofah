@@ -28,14 +28,13 @@ elif COMMOM_R_W < COMMOM_R_H :
 
 WIDTH = int(1920*COMMOM_R)
 HEIGHT = int(1200*COMMOM_R)
-print( S_WIDTH, S_HEIGHT )
 # define player initial position
 PLAYER_Y = int(540*COMMOM_R)
 #define player continuous jump time
 PLAYER_JUMP = 2
 PLAYER_DOWN = 2
 PLAYER_ATTACK = 2
-gravity = 10
+gravity = int(10*COMMOM_R)
 # define player health
 HEALTH = 100
 # define health size
@@ -138,7 +137,7 @@ for i in range(0, 7) :
     elif i+1 == 3 :
         image = pygame.transform.scale( image, (2048*COMMOM_R*0.25, 2048*COMMOM_R*0.25) ) # 飛天雞 2048*2048
     elif i+1 == 4 :
-        image = pygame.transform.scale( image, (408*COMMOM_R, 408*COMMOM_R) ) # 球 408*408
+        image = pygame.transform.scale( image, (408*COMMOM_R*0.85, 408*COMMOM_R*0.85) ) # 球 408*408
     elif i+1 == 5 or 6 or 7 :
         if i+1 == 6 :
             image01 = image.copy()

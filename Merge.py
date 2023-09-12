@@ -46,7 +46,7 @@ RED = (248,141,110) # F88D6E
 screen = pygame.display.set_mode((Material.S_WIDTH, Material.S_HEIGHT), pygame.FULLSCREEN) # create screen
 pygame.display.set_caption('Running loofah') # 開始前標題
 # define speed
-fps = 60 # 每秒60幀 
+fps = 100 # 每秒60幀 
 # define time
 timer = pygame.time.Clock()
 
@@ -271,6 +271,7 @@ def times_1(time, past) :
         time += 1
     return time, past
 
+#def times_2(time, past) :
 def times_2(time, past, player) :
     now = pygame.time.get_ticks()
     if ( int(( now - past ) / 1000) == 1 ) :
@@ -465,7 +466,6 @@ class Ground(pygame.sprite.Sprite) :
         self.rect.x -= self.speed_X
         if self.rect.right <= 0 :
             self.rect.x = (Material.GROUND_NUM-1)*(int(420*Material.COMMOM_R)) + self.rect.right
-            print("self.rect.x ", self.rect.x)
 
 class Cloud(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -583,8 +583,6 @@ def run():
                     ground.rect.x = ground.rect.x + total_len
                     all_sprites.add(ground)
                     total_len = total_len + int(420*Material.COMMOM_R)
-                    if i == Material.GROUND_NUM - 2 :
-                      print(total_len)
 
                 count = random.randrange( 1, 3 )
                 for i in range( 0, count ) :
@@ -613,11 +611,6 @@ def run():
             exit()     
           else :
               preview = frame.copy()
-              #frame = cv2.resize(frame, (150, 100))
-              #frame = np.rot90(frame)
-              #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-              #frame = pygame.surfarray.make_surface(frame) 
-              ### cv2.imshow( "AAAA", cv2.flip(frame, 1)) 
               rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
               results = pose.process(rgbframe) # 從影像增測姿勢  
               mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
@@ -629,12 +622,13 @@ def run():
               # Create obstacle
               functions = [(Set.Set1), (Set.Set2), (Set.Set3), (Set.Set4), (Set.Set5)]
               
+              
               if changeTime:
                   # 隨機選擇並調用一個函數
                   if time % 30 == 0:
                       func = random.choice(functions)
                   func(time, all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
-                  # Set.Set1(time, all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
+                  #Set.Set1(time, all_sprites, obstacles, attackObstacles, attackObstacles_down, attackObstacles_up)
 
               # update game
               back_sprites.update()
@@ -644,9 +638,11 @@ def run():
               # display
               screen.blit(Material.background4_img, (0,0))
               backornot = random.randrange( 0, 60 )
+              
               if backornot == 4 :
                 o = Cloud()
                 back_sprites.add(o)
+
               if backornot == 20 :
                 o = Tree()
                 back_sprites.add(o)
@@ -654,11 +650,11 @@ def run():
               back_sprites.draw(screen)
               all_sprites.draw(screen)
               screen.blit(preview, ( 0, int(1000*Material.COMMOM_R) ) )
-              #screen.blit(frame, ( 0, 500 ) )
               draw_health(screen, player.health, int(120*Material.COMMOM_R_W), int(64*Material.COMMOM_R_H) )
               screen.blit(Material.healthstate_head, (int(20*Material.COMMOM_R_W),int(20*Material.COMMOM_R_H)))
               
               # timer
+              #time, past = times_2(time, past)
               time, past = times_2(time, past, player)
 
               if time != pretime:
@@ -671,7 +667,6 @@ def run():
                   show_init = True  
 
               # print( "now: ", now, " past: ", past, "now-past: ", ( now - past ) / 1000 )
-
               player.key_pressed = pygame.key.get_pressed()
               if player.mode_jump == 1 or player.keyjump == 1 :
               #if player.key_pressed[pygame.K_UP] :

@@ -166,7 +166,6 @@ def Photograph(screen, fps, timer, cam):
   for i in range(16):
     RunArr.append('./img/player'+ str(i+1) + '.png' )
   minify = [0.75, 90, 40, 10] # 縮放 x軸 y軸 旋轉
-  print(0.75*Material.COMMOM_R, Material.COMMOM_R)
   for i in range(16):
     if ( not CompositePicture(head,  RunArr[i], path_output_RUN, i+1, minify ) ) :
        return False
