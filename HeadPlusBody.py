@@ -6,6 +6,8 @@ import pygame
 import RecongnitionNext
 import Material
 
+PURPLE = (77, 97, 255)
+WHITE = (255, 255, 255)
 pygame.mixer.init()
 #load music mp3
 camera_mp3 = pygame.mixer.Sound(os.path.join("mp3", "cameraMusic.mp3"))
@@ -115,13 +117,22 @@ def Photograph(screen, fps, timer, cam):
     output = cv2.cvtColor(output, cv2.COLOR_BGR2RGB)
     output = np.rot90(output)
     output = pygame.surfarray.make_surface(output)
+    screen.blit(Material.background1_img, (0,0))
+    cnt = ""
+    if str(int(sec)) != "0" :
+      for i in range(50) :
+        cnt = cnt + str(int(sec))
+      for i in range(15) :
+        Material.draw_text( screen, cnt, int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT*(i)/15, PURPLE )
     screen.blit(output, ( (Material.S_WIDTH-w)/2, Material.S_HEIGHT/3 ) )
     screen.blit(Material.takephoto, ((Material.S_WIDTH-Material.WIDTH)/2,0))
-    Material.draw_text( screen, 'running loofah', int(130*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 )
-    Material.draw_text( screen, 'align your head with the circle', int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5 )
-    Material.draw_text( screen, 'please raise your hand', int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5+int(60*Material.COMMOM_R) )
+    Material.draw_text( screen, 'running loofah', int(130*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE )
+    Material.draw_text( screen, 'align your head with the circle', int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5, WHITE )
+    Material.draw_text( screen, 'please raise your hand', int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5+int(60*Material.COMMOM_R), WHITE )
+    '''
     if str(int(sec)) != "0" :
       Material.draw_text( screen, str(int(sec)), int(200*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/1.2 )   
+    '''
 
     pygame.display.update()
     

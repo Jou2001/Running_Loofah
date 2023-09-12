@@ -80,43 +80,6 @@ def MoviePlay( mp4 ) :
     # 释放资源
     mp4.reader.close()
 
-'''
-def ReadVideo(videoName, txt, txtSize) :
-    video = cv2.VideoCapture(videoName)
-    video_fps = video.get(cv2.CAP_PROP_FPS)
-    while True :
-        timer.tick(video_fps)
-        ret, frame = video.read()
-        if ret == True :
-            frame = cv2.resize(frame,(Material.WIDTH,Material.HEIGHT))
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = np.rot90(frame, -1)
-            frame = pygame.surfarray.make_surface(frame)
-            frame = pygame.transform.flip(frame, False, True)
-            screen.blit(frame, ( (Material.S_WIDTH-Material.WIDTH)/2, (Material.S_HEIGHT-Material.HEIGHT)/2 ) ) 
-            for event in pygame.event.get() :
-                if event.type == pygame.QUIT :
-                    pygame.quit()
-            if ( txt != "" ):        
-              Material.draw_text( screen, txt, txtSize, Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
-            pygame.display.flip()
-        else : 
-            break
-'''
-'''
-def draw_text( surf, text, size, x, y ) :
-    font = pygame.font.Font( fout_txt, size )
-    # font = pygame.font.SysFont( "arial", size )
-    text_surface = font.render( text, True, WHITE )
-    text_rect = text_surface.get_rect()
-    text_rect.centerx = x
-    text_rect.top = y
-    surf.blit( text_surface, text_rect )
-'''
-
-
-
-
 def draw_start() :
     global cap
 
@@ -136,10 +99,10 @@ def draw_start() :
         count_line = int(Material.S_HEIGHT/10)
         # print(count_line)
         txt_size = int(40*Material.COMMOM_R_H)
-        Material.draw_text( screen, "INTRODUCE", int(100*Material.COMMOM_R_H), int(Material.S_WIDTH/2), count_line ) # 60 
+        Material.draw_text( screen, "INTRODUCE", int(100*Material.COMMOM_R_H), int(Material.S_WIDTH/2), count_line, WHITE ) # 60 
         count_line = count_line + txt_size + int(100*Material.COMMOM_R_H)
         for txt in txt_line :
-            Material.draw_text( screen, txt, txt_size, int(Material.S_WIDTH/2), count_line ) 
+            Material.draw_text( screen, txt, txt_size, int(Material.S_WIDTH/2), count_line, WHITE ) 
             count_line = count_line + 2 * txt_size
 
         for event in pygame.event.get() :
@@ -173,7 +136,7 @@ def draw_intro() :
         ret, img = cap.read()
         time, past = times_1(time, past)
 
-        if time % 2 == 0 and p != time :
+        if time % 1 == 0 and p != time :
             count += 1
             p = time
 
@@ -185,23 +148,39 @@ def draw_intro() :
         screen.blit(Material.background1_img, (0,0))
 
         if active == 1 :
-            screen.blit(Material.intro_jump, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
-            Material.draw_text( screen, "HOW TO JUMP", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
+            if count % 2 == 0 :
+              screen.blit(Material.intro_jump, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))              
+            else :
+              screen.blit(Material.intro_jump_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))        
+
+            Material.draw_text( screen, "HOW TO JUMP", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 2 :
-            screen.blit(Material.intro_slip_1, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
-            Material.draw_text( screen, "HOW TO SLIP No.1", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
+            if count % 2 == 0 :
+              screen.blit(Material.intro_slip_1, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
+            else :
+              screen.blit(Material.intro_slip_1_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
+
+            Material.draw_text( screen, "HOW TO SLIP No.1", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 3 :
-            screen.blit(Material.intro_slip_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
-            Material.draw_text( screen, "HOW TO SLIP No.2", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
+            if count % 2 == 0 :
+              screen.blit(Material.intro_slip_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
+            else :
+              screen.blit(Material.intro_slip_2_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
+
+            Material.draw_text( screen, "HOW TO SLIP No.2", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 4 :
-            screen.blit(Material.intro_attack, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
-            Material.draw_text( screen, "HOW TO ATTACK", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
+            if count % 2 == 0 :
+              screen.blit(Material.intro_attack, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
+            else :
+              screen.blit(Material.intro_attack_2, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
+                
+            Material.draw_text( screen, "HOW TO ATTACK", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 5 :
             if count % 2 == 0 :
                 screen.blit(Material.intro_handup_left, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H))) # 200*340 
             else :
                 screen.blit(Material.intro_handup_right, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
-            Material.draw_text( screen, "HOW TO SKIP", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10 ) # 60
+            Material.draw_text( screen, "HOW TO SKIP", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         else :
             waiting = False
 
@@ -236,11 +215,11 @@ def draw_intro() :
            ((mode_next == 1 or key_pressed[pygame.K_RETURN]) and active == 5) :
             active += 1
             Material.good_mp3.play()
-            Material.draw_text( screen, "Good!" , int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(200*Material.COMMOM_R) )
+            Material.draw_text( screen, "Good!" , int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(200*Material.COMMOM_R), WHITE )
             pygame.display.update()
             pygame.time.wait(500) 
         else :
-            Material.draw_text( screen, "Bad!" , int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(200*Material.COMMOM_R) )
+            Material.draw_text( screen, "Bad!" , int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(200*Material.COMMOM_R), WHITE )
             pygame.display.update()
          
     
@@ -256,8 +235,8 @@ def draw_init() :
         timer.tick(fps)
         time, past = times_1(time, past)
         screen.blit(Material.background1_img, (0,0))
-        Material.draw_text( screen, 'align your head with the circle', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5 )
-        Material.draw_text( screen, 'please raise your hand', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5+int(100*Material.COMMOM_R) )
+        Material.draw_text( screen, 'align your head with the circle', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5, WHITE )
+        Material.draw_text( screen, 'please raise your hand', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5+int(100*Material.COMMOM_R), WHITE )
 
         for event in pygame.event.get() :
           if event.type == pygame.QUIT :
@@ -302,7 +281,7 @@ def times_2(time, past, player) :
     secs = time % 60
     mins = int(time/60) % 60
     hours = int(time/3600) % 24
-    Material.draw_text( screen, f"{hours:02}:{mins:02}:{secs:02}", int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT )
+    Material.draw_text( screen, f"{hours:02}:{mins:02}:{secs:02}", int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT, WHITE )
     return time, past
 
 class Player(pygame.sprite.Sprite) :
@@ -372,7 +351,7 @@ class Player(pygame.sprite.Sprite) :
             if self.rect.y == Material.PLAYER_Y :
               Material.jump_mp3.play()   
 
-            self.change_y = 60
+            self.change_y = 120*Material.COMMOM_R
             self.countJump = Material.PLAYER_JUMP
 
         elif self.change_y > 0 or self.rect.y < Material.PLAYER_Y : 
@@ -464,7 +443,7 @@ class Bullet(pygame.sprite.Sprite) :
     def update(self) :
         self.rotate()
         self.rect.x += self.speedx
-        if self.rect.left >= Material.WIDTH:
+        if self.rect.left >= Material.S_WIDTH:
             self.kill()
 
     def rotate(self) :
@@ -568,8 +547,8 @@ def run():
     else :
       pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
       pygame.mixer_music.play()
-      draw_start()
-      draw_intro()
+      #draw_start()
+      #draw_intro()
 
       o = Sun()
       back_sprites.add(o)
@@ -696,30 +675,30 @@ def run():
               player.key_pressed = pygame.key.get_pressed()
               if player.mode_jump == 1 or player.keyjump == 1 :
               #if player.key_pressed[pygame.K_UP] :
-                  Material.draw_text( screen, "Good Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R) )
+                  Material.draw_text( screen, "Good Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
               elif player.mode_jump == 2 or player.keyjump == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
-                  Material.draw_text( screen, "So so Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R) )
+                  Material.draw_text( screen, "So so Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
               elif player.mode_jump == 3 or player.keyjump == 0 :
-                  Material.draw_text( screen, "Bad Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R) )
+                  Material.draw_text( screen, "Bad Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
                   
               if player.mode_down == 1 or player.keydown == 1 :
               #if player.key_pressed[pygame.K_UP] :
-                  Material.draw_text( screen, "Good Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R) )
+                  Material.draw_text( screen, "Good Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_down == 2 or player.keydown == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
-                  Material.draw_text( screen, "So so Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R) )
+                  Material.draw_text( screen, "So so Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_down == 3 or player.keydown == 0 :
-                  Material.draw_text( screen, "Bad Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R) )
+                  Material.draw_text( screen, "Bad Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
                   
               if player.mode_attack == 1 or player.keyattack == 1 :
               #if player.key_pressed[pygame.K_UP] :
-                  Material.draw_text( screen, "Good Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R) )
+                  Material.draw_text( screen, "Good Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
               elif player.mode_attack == 2 or player.keyattack == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
-                  Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R) )
+                  Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
               elif player.mode_attack == 3 or player.keyattack == 0 :
-                  Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R) )
+                  Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
 
               pygame.sprite.groupcollide(attackObstacles, bullets, True, True)
               hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_mask) # 注意碰撞範圍

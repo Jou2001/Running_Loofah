@@ -8,6 +8,8 @@ import mediapipe as mp
 import pyautogui
 import math
 
+WHITE = (255, 255, 255)
+PURPLE = (171, 38, 201)
 # initial
 pygame.init()
 pygame.mixer.init()
@@ -33,7 +35,7 @@ PLAYER_Y = int(540*COMMOM_R)
 PLAYER_JUMP = 2
 PLAYER_DOWN = 2
 PLAYER_ATTACK = 2
-gravity = 10*COMMOM_R_W
+gravity = 10
 # define player health
 HEALTH = 100
 # define health size
@@ -74,6 +76,15 @@ intro_handup_left = pygame.image.load(os.path.join("img", "intro_handup_left.png
 intro_handup_left = pygame.transform.scale( intro_handup_left, (468*COMMOM_R, 668*COMMOM_R) ) # 468*668
 intro_handup_right = pygame.image.load(os.path.join("img", "intro_handup_right.png")).convert_alpha()
 intro_handup_right = pygame.transform.scale( intro_handup_right, (468*COMMOM_R, 668*COMMOM_R) ) # 468*668
+
+intro_attack_2 = pygame.image.load(os.path.join("img", "intro_attack-2.png")).convert_alpha()
+intro_attack_2 = pygame.transform.scale( intro_attack_2, (420*COMMOM_R, 680*COMMOM_R) ) # 420*680
+intro_jump_2 = pygame.image.load(os.path.join("img", "intro_jump-2.png")).convert_alpha()
+intro_jump_2 = pygame.transform.scale( intro_jump_2, (340*COMMOM_R, 590*COMMOM_R) ) # 340*590
+intro_slip_1_2 = pygame.image.load(os.path.join("img", "intro_slip_1-2.png")).convert_alpha()
+intro_slip_1_2 = pygame.transform.scale( intro_slip_1_2, (560*COMMOM_R, 600*COMMOM_R) ) # 560*600
+intro_slip_2_2 = pygame.image.load(os.path.join("img", "intro_slip_2-2.png")).convert_alpha()
+intro_slip_2_2 = pygame.transform.scale( intro_slip_2_2, (560*COMMOM_R, 600*COMMOM_R) ) # 560*600
 
 bullet = pygame.image.load(os.path.join("img", "bullet.png")).convert_alpha()
 bullet = pygame.transform.scale( bullet, (912*COMMOM_R*0.11, 1032*COMMOM_R*0.11) ) # 912*1032 /18
@@ -139,10 +150,10 @@ obstacle.append( image )
 # load into txt
 fout_txt = os.path.join( "Handwriting.ttf" )
 
-def draw_text( surf, text, size, x, y ) :
+def draw_text( surf, text, size, x, y, colors ) :
     font = pygame.font.Font( fout_txt, size )
     # font = pygame.font.SysFont( "arial", size )
-    text_surface = font.render( text, True, WHITE )
+    text_surface = font.render( text, True, colors )
     text_rect = text_surface.get_rect()
     text_rect.centerx = x
     text_rect.top = y
