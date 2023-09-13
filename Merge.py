@@ -15,7 +15,6 @@ import numpy as np
 import Set
 from moviepy.editor import *
 import mediapipe as mp
-import pyautogui
 
 
 mp_drawing = mp.solutions.drawing_utils
@@ -46,7 +45,7 @@ RED = (248,141,110) # F88D6E
 screen = pygame.display.set_mode((Material.S_WIDTH, Material.S_HEIGHT), pygame.FULLSCREEN) # create screen
 pygame.display.set_caption('Running loofah') # 開始前標題
 # define speed
-fps = 100 # 每秒60幀 
+fps = 60 # 每秒60幀 
 # define time
 timer = pygame.time.Clock()
 
@@ -484,8 +483,13 @@ class Cloud(pygame.sprite.Sprite) :
 class Tree(pygame.sprite.Sprite) :
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
+        self.size = random.randrange( 6, 11 )
         self.type = random.randrange( 0, 2 )
         self.image = Material.tree[self.type]
+        if self.type == 0 :
+            self.image = pygame.transform.scale( self.image, (638*Material.COMMOM_R*self.size/10, 478*Material.COMMOM_R*self.size/10) ) # 638*478
+        else:
+            self.image = pygame.transform.scale( self.image, (448*Material.COMMOM_R*self.size/10, 848*Material.COMMOM_R*self.size/10) ) # 488*848
         self.rect = self.image.get_rect()
         self.rect.x = Material.S_WIDTH # 960
         self.rect.bottom = int(1060*Material.COMMOM_R_H)
