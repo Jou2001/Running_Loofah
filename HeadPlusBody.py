@@ -3,18 +3,16 @@ import cv2
 import numpy as np
 from PIL import Image
 import pygame
-import Merge
 import RecongnitionNext
+import Material
 
+PURPLE = (77, 97, 255)
+WHITE = (255, 255, 255)
 pygame.mixer.init()
 #load music mp3
 camera_mp3 = pygame.mixer.Sound(os.path.join("mp3", "cameraMusic.mp3"))
 
 path_input = "./picture"
-WIDTH = 960
-HEIGHT = 600
-
-
 
 def CompositePicture(input_head, input_body, path_output, index, minify):
   if os.path.isfile(input_head) and os.path.isfile(input_body):
@@ -24,7 +22,7 @@ def CompositePicture(input_head, input_body, path_output, index, minify):
 
     widthB , heightB = img_body.size
     widthA , heightA = img_head.size
-    new_img_head  = img_head.resize((int(widthA*minify[0]),int(heightA*minify[0])), Image.LANCZOS)
+    new_img_head  = img_head.resize((int((widthA/(Material.COMMOM_R*2))*minify[0]),int((heightA/(Material.COMMOM_R*2))*minify[0])), Image.LANCZOS)
     new_img_body  = img_body.resize(img_body.size,Image.LANCZOS)
     new_img_head = new_img_head.rotate(minify[3])  
     
@@ -85,15 +83,14 @@ def Photograph(screen, fps, timer, cam):
     # cv2.rectangle( img, (x1, y1), (x2, y2), (0,0,255), 5 )
     #img = cv2.flip(img, 1) #矩陣左右翻轉
     img = cv2.cvtColor(img, cv2.COLOR_BGR2BGRA)
-    img = cv2.resize(img,(int(img.shape[1]*0.7),int(img.shape[0]*0.7)))
+    img = cv2.resize(img,(int(img.shape[1]*1.4*Material.COMMOM_R),int(img.shape[0]*1.4*Material.COMMOM_R)))
     
     w = int(img.shape[1])
     h = int(img.shape[0])      
- 
     white = 255 - np.zeros((h,w,4), dtype='uint8')
 
-    # cv2.circle(img, (int(w*0.5), int(h*0.5)), 121, 255, 5)
-    x1, y1, x2, y2 = [int(w*0.5)+120, int(h*0.5)+120, int(w*0.5)-120, int(h*0.5)-120 ]
+    #cv2.circle(img, (int(w*0.5), int(h*0.5)), int(240*Material.COMMOM_R), 255, 5)
+    x1, y1, x2, y2 = [(int(w*0.5)+240*Material.COMMOM_R), (int(h*0.5)+240*Material.COMMOM_R), (int(w*0.5)-240*Material.COMMOM_R), (int(h*0.5)-240*Material.COMMOM_R) ]
 
 
     mode_next = RecongnitionNext.main(cam)
@@ -111,7 +108,7 @@ def Photograph(screen, fps, timer, cam):
             if a < 0:
                 a = 0
                 # 裁切圖片
-                photo = photo[y2+5:y1-5, x2+5:x1-5]
+                photo = photo[int(y2):int(y1), int(x2):int(x1)]
 
                 cv2.imwrite( path_input + '/head_body/head.jpg', cv2.flip(photo, 1))
                 break
@@ -120,13 +117,22 @@ def Photograph(screen, fps, timer, cam):
     output = cv2.cvtColor(output, cv2.COLOR_BGR2RGB)
     output = np.rot90(output)
     output = pygame.surfarray.make_surface(output)
-    screen.blit(output, ( 256, 200 ) )
-    screen.blit(Merge.takephoto, (0,0))
-    Merge.draw_text( screen, 'running loofah', 65, WIDTH/2, HEIGHT/10 )
-    Merge.draw_text( screen, 'align your head with the circle', 30, WIDTH/2, HEIGHT/5 )
-    Merge.draw_text( screen, 'please raise your hand', 30, WIDTH/2, HEIGHT/5+30 )
+    screen.blit(Material.background1_img, (0,0))
+    cnt = ""
     if str(int(sec)) != "0" :
-      Merge.draw_text( screen, str(int(sec)), 100, WIDTH/2, HEIGHT/1.2 )   
+      for i in range(50) :
+        cnt = cnt + str(int(sec))
+      for i in range(15) :
+        Material.draw_text( screen, cnt, int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT*(i)/15, PURPLE )
+    screen.blit(output, ( (Material.S_WIDTH-w)/2, Material.S_HEIGHT/3 ) )
+    screen.blit(Material.takephoto, ((Material.S_WIDTH-Material.WIDTH)/2,0))
+    Material.draw_text( screen, 'running loofah', int(130*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE )
+    Material.draw_text( screen, 'align your head with the circle', int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5, WHITE )
+    Material.draw_text( screen, 'please raise your hand', int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/5+int(60*Material.COMMOM_R), WHITE )
+    '''
+    if str(int(sec)) != "0" :
+      Material.draw_text( screen, str(int(sec)), int(200*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/1.2 )   
+    '''
 
     pygame.display.update()
     
