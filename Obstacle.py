@@ -1,6 +1,7 @@
 import pygame
 import os
 import Material
+from Merge import show_hint
 
 JUMP_BOTTOM = 900*Material.COMMOM_R
 ATTACK_BOTTOM = 960*Material.COMMOM_R
@@ -33,6 +34,9 @@ class Jump_Obstacle(pygame.sprite.Sprite) : # 4.球 408*408
         self.rect.x -= self.speed_X
         if self.rect.right < 0:
             self.kill()
+
+        if self.rect.x < int(Material.S_WIDTH*5/12) and self.rect.x > int(Material.COMMOM_R_W/4):
+            show_hint("jump")
     
     def rotate(self) :
         self.total_degree += self.rot_degree
@@ -96,6 +100,9 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
 
         if self.rect.right < 0:
             self.kill()
+
+        if self.rect.x < int(Material.S_WIDTH*5/12) and self.rect.x > int(Material.COMMOM_R_W/4):
+            show_hint("attack")
         
 
     def change_post(self) :
@@ -133,6 +140,9 @@ class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
 
         if self.rect.right < 0:
             self.kill()
+
+        if self.rect.x < int(Material.S_WIDTH*5/12) and self.rect.x > int(Material.COMMOM_R_W/4):
+            show_hint("slip")
 
 def New_JumpObstacle(all_sprites, obstacles) :
     o = Jump_Obstacle()
