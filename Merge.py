@@ -551,8 +551,8 @@ def run():
     else :
       pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
       pygame.mixer_music.play()
-      draw_start()
-      draw_intro()
+      # draw_start()
+      # draw_intro()
 
       o = Sun()
       back_sprites.add(o)
