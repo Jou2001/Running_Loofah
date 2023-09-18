@@ -110,7 +110,6 @@ def draw_start() :
 
         pygame.display.update()
 
-
 def draw_intro() :
     global cap
 
@@ -221,7 +220,6 @@ def draw_intro() :
             Material.draw_text( screen, "Bad!" , int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(200*Material.COMMOM_R), WHITE )
             pygame.display.update()
          
-    
 def draw_init() :
     global cap
     screen.blit(Material.background1_img, (0,0))
@@ -261,7 +259,6 @@ def draw_init() :
     Material.player_slip_img = pygame.transform.scale( Material.player_slip_img, (470*Material.COMMOM_R, 256*Material.COMMOM_R) ) # 470*256
     Material.healthstate_head = pygame.image.load(os.path.join("picture","player" , "HEALTHHEAD_1.png")).convert_alpha()
     Material.healthstate_head = pygame.transform.scale( Material.healthstate_head, (200*Material.COMMOM_R*0.65, 201*Material.COMMOM_R*0.65) ) # 200*201
-
 
 def times_1(time, past) :
     now = pygame.time.get_ticks()
@@ -535,6 +532,26 @@ def draw_health(surf, hp, x, y ):
 
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
+def show_hint(action):
+    if action == "attack":
+        screen.blit(Material.hint_attack, (int(60*Material.COMMOM_R_W),int(150*Material.COMMOM_R_H))) # 420*680
+        Material.draw_text( screen, "Attack!", int(50*Material.COMMOM_R), int(230*Material.COMMOM_R_W), int(170*Material.COMMOM_R_H), WHITE )
+        # attack_action = pygame.transform.scale( intro_attack, (42, 68) ) # 420*680
+        # screen.blit(attack_action, (145,60))
+        # draw_text( screen, "Attack!", 50, 95, 60 )
+    elif action == "slip":
+        screen.blit(Material.hint_slip, (int(60*Material.COMMOM_R_W),int(150*Material.COMMOM_R_H)))
+        Material.draw_text( screen, "Slip!", int(50*Material.COMMOM_R), int(230*Material.COMMOM_R_W), int(170*Material.COMMOM_R_H), WHITE )
+        # slip_action = pygame.transform.scale( intro_slip_1, (56, 30) ) # 560*300
+        # screen.blit(slip_action, (135,60))
+        # draw_text( screen, "Slip!", 50, 80, 60 )
+    elif action == "jump":
+        screen.blit(Material.hint_jump, (int(60*Material.COMMOM_R_W),int(150*Material.COMMOM_R_H))) 
+        Material.draw_text( screen, "Jump!", int(50*Material.COMMOM_R), int(230*Material.COMMOM_R_W), int(170*Material.COMMOM_R_H), WHITE )
+        # jump_action = pygame.transform.scale( intro_jump, (50, 70) ) # 340*590
+        # screen.blit(jump_action, (135,60))
+        # draw_text( screen, "Jump!", 50, 80, 60 )
+        
 
 def run():
     global cap, all_sprites, attackObstacles, attackObstacles_down, attackObstacles_up
@@ -723,7 +740,7 @@ def run():
                   MoviePlay( Material.win_mp4 ) 
                   show_init = True
 
-              pygame.display.update()
+            #   pygame.display.update()
 
       pygame.quit()
 

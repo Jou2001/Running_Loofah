@@ -158,3 +158,8 @@ def draw_text( surf, text, size, x, y, colors ) :
     text_rect.top = y
     surf.blit( text_surface, text_rect )
 
+# hint picture
+hint_attack = pygame.transform.scale( intro_attack, (63*COMMOM_R, 102*COMMOM_R) )
+hint_jump = pygame.transform.scale( intro_jump, (75*COMMOM_R, 105*COMMOM_R) ) # 340*590
+hint_slip = pygame.transform.scale( intro_slip_1, (84*COMMOM_R, 90*COMMOM_R) ) # 560*600
+
