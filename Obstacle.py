@@ -1,25 +1,27 @@
 import pygame
 import os
-import Merge
+import Material
 
-JUMP_BOTTOM = 450
-ATTACK_BOTTOM = 480
-SLIDE_BOTTOM = 360
+JUMP_BOTTOM = 900*Material.COMMOM_R
+ATTACK_BOTTOM = 960*Material.COMMOM_R
+SLIDE_BOTTOM = 720*Material.COMMOM_R
 STEP1 = 1
 STEP2 = 2
 STEP3 = 3
-ATTACK_HIGH = 95
-attackObstacles = pygame.sprite.Group()    
+ATTACK_HIGH = 190*Material.COMMOM_R
+attackObstacles = pygame.sprite.Group() 
+CHICKEN = 2
+BALL = 3   
+PIG = 4
 
 class Jump_Obstacle(pygame.sprite.Sprite) : # 4.球 408*408
     def __init__(self) :
         pygame.sprite.Sprite.__init__(self)
         self.speed_X = 15
-        self.radius = 100
-        self.img_ori = Merge.obstacle[3]
+        self.img_ori = Material.obstacle[BALL]
         self.image = self.img_ori.copy()
         self.rect = self.image.get_rect()
-        self.rect.x = Merge.WIDTH
+        self.rect.x = Material.S_WIDTH
         self.rect.bottom = JUMP_BOTTOM # 450
         self.energy = 10
         self.rot_degree = 3
@@ -42,9 +44,9 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
         pygame.sprite.Sprite.__init__(self)
         self.speed_X = 15
         self.radius = 10
-        self.image = Merge.obstacle[4]
+        self.image = Material.obstacle[PIG]
         self.rect = self.image.get_rect()
-        self.rect.x = Merge.WIDTH
+        self.rect.x = Material.S_WIDTH
         self.rect.bottom = ATTACK_BOTTOM # 480
         self.gravity = 1
         self.change_y = 3
@@ -60,7 +62,7 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
         if self.type == STEP1 :
             self.change_post()
         elif self.type == STEP2 :
-            self.image = Merge.obstacle[7]
+            self.image = Material.obstacle[7]
             self.high = ATTACK_HIGH   
 
         self.rect.x -= self.speed_X
@@ -78,7 +80,7 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
                 self.change_y = 3 
 
         elif self.type == STEP3 :
-            self.image = pygame.transform.scale( Merge.obstacle[5], (820*Merge.COMMOM_R*0.665*self.size, 570*Merge.COMMOM_R*0.665*self.size) )
+            self.image = pygame.transform.scale( Material.obstacle[5], (820*Material.COMMOM_R*0.665*self.size, 570*Material.COMMOM_R*0.665*self.size) )
             self.size += 0.1
             if self.size >= 1 :
                 self.size = 1
@@ -100,7 +102,7 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
         self.run_time += 1 # 0 1 2
         if self.run_time == 3 :
             self.run_time = 0
-        self.image = Merge.obstacle[self.run_time + 4] # 4 5 6
+        self.image = Material.obstacle[self.run_time + 4] # 4 5 6
 
 class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
     def __init__(self) :
@@ -108,10 +110,10 @@ class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
         self.speed_X = 15
         self.gravity = 5
         self.change_y = 10
-        self.radius = 80
-        self.image = Merge.obstacle[2]
+        self.radius = 160*Material.COMMOM_R
+        self.image = Material.obstacle[CHICKEN]
         self.rect = self.image.get_rect()
-        self.rect.x = Merge.WIDTH
+        self.rect.x = Material.S_WIDTH
         self.rect.bottom = SLIDE_BOTTOM # 360
         self.energy = 15
         self.mask = pygame.mask.from_surface(self.image)  
@@ -146,7 +148,7 @@ def New_AttackObstacle(all_sprites, obstacles, attackObstacles, attackObstacles_
     o = Attack_Obstacle()
     o.type = STEP2
     o.rect.bottom = ATTACK_BOTTOM - ATTACK_HIGH # 480-95
-    o.rect.x = Merge.WIDTH + 25
+    o.rect.x = Material.S_WIDTH + 50*Material.COMMOM_R
     all_sprites.add(o)
     obstacles.add(o)
     attackObstacles.add(o)
