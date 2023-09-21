@@ -16,6 +16,7 @@ import Set
 from moviepy.editor import *
 import mediapipe as mp
 
+GAME_TIME = 60
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -275,7 +276,7 @@ def times_2(time, past, player) :
     now = pygame.time.get_ticks()
     if ( int(( now - past ) / 1000) == 1 ) :
         past = now
-        time -= 1
+        time += 1
         player.count_jump()
     
     secs = time % 60
@@ -535,6 +536,10 @@ def draw_health(surf, hp, x, y ):
 
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
+def end_animate() :
+    running = True
+    #while (running) :
+     #   if 
 
 def run():
     global cap, all_sprites, attackObstacles, attackObstacles_down, attackObstacles_up
@@ -542,7 +547,7 @@ def run():
     show_init = True
     running = True
     changeTime = True
-    pretime = 60
+    pretime = 0
 
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
@@ -551,8 +556,8 @@ def run():
     else :
       pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
       pygame.mixer_music.play()
-      draw_start()
-      draw_intro()
+      #draw_start()
+      #draw_intro()
 
       o = Sun()
       back_sprites.add(o)
@@ -572,7 +577,7 @@ def run():
                 pygame.mixer_music.load(os.path.join("mp3", "game_music.mp3"))
                 pygame.mixer_music.play()
                 # init timer
-                time = 60
+                time = 0
                 now = pygame.time.get_ticks()
                 past = now
 
@@ -627,7 +632,7 @@ def run():
               functions = [(Set.Set1), (Set.Set2), (Set.Set3), (Set.Set4), (Set.Set5)]
               
               
-              if changeTime:
+              if changeTime and time <= GAME_TIME :
                   # 隨機選擇並調用一個函數
                   if time % 30 == 0:
                       func = random.choice(functions)
@@ -667,9 +672,10 @@ def run():
               else:
                   changeTime = False
 
+              '''
               if ( time == -1 ) :
                   show_init = True  
-
+              '''
               # print( "now: ", now, " past: ", past, "now-past: ", ( now - past ) / 1000 )
               player.key_pressed = pygame.key.get_pressed()
               if player.mode_jump == 1 or player.keyjump == 1 :
@@ -698,7 +704,9 @@ def run():
                   Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
               elif player.mode_attack == 3 or player.keyattack == 0 :
                   Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
-
+              
+              Material.draw_text( screen, str(len(obstacles)) , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(160*Material.COMMOM_R), WHITE )
+              
               pygame.sprite.groupcollide(attackObstacles, bullets, True, True)
               hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_mask) # 注意碰撞範圍
               for hit in hits :               
@@ -717,14 +725,15 @@ def run():
                         attackObstacles_up.get_sprite(i).size = 0.7
                         attackObstacles_up.get_sprite(i).change_y = 0
                   
-              if time == 0 and  player.health > 0:
-                  screen.blit(Material.background1_img, (0,0))
-                  pygame.display.update()   
-                  MoviePlay( Material.win_mp4 ) 
-                  show_init = True
+              if len(obstacles) == 0 and time > GAME_TIME and player.health > 0:
+                    screen.blit(Material.background1_img, (0,0))
+                    pygame.display.update()   
+                    MoviePlay( Material.win_mp4 ) 
+                    show_init = True
 
               pygame.display.update()
 
+      
       pygame.quit()
 
 

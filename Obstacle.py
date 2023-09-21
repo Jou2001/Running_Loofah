@@ -9,7 +9,6 @@ STEP1 = 1
 STEP2 = 2
 STEP3 = 3
 ATTACK_HIGH = 190*Material.COMMOM_R
-attackObstacles = pygame.sprite.Group() 
 CHICKEN = 2
 BALL = 3   
 PIG = 4
