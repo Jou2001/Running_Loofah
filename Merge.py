@@ -15,6 +15,7 @@ import numpy as np
 import Set
 from moviepy.editor import *
 import mediapipe as mp
+from Ranking import Make_Leaderboard
 
 
 mp_drawing = mp.solutions.drawing_utils
@@ -309,6 +310,7 @@ class Player(pygame.sprite.Sprite) :
         self.keydown = 0
         self.keyattack = 0   
         self.mask = pygame.mask.from_surface(self.image)  
+        self.score = 0
 
     def update(self) :
         self.mode_jump = RecognitionSquat.main(cap)
@@ -692,27 +694,33 @@ def run():
               if player.mode_jump == 1 or player.keyjump == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
+                  player.score += 5
               elif player.mode_jump == 2 or player.keyjump == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
+                  player.score += 3
               elif player.mode_jump == 3 or player.keyjump == 0 :
                   Material.draw_text( screen, "Bad Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
                   
               if player.mode_down == 1 or player.keydown == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                  player.score += 5
               elif player.mode_down == 2 or player.keydown == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                  player.score += 3
               elif player.mode_down == 3 or player.keydown == 0 :
                   Material.draw_text( screen, "Bad Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
                   
               if player.mode_attack == 1 or player.keyattack == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
+                  player.score += 5
               elif player.mode_attack == 2 or player.keyattack == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
+                  player.score += 3
               elif player.mode_attack == 3 or player.keyattack == 0 :
                   Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
 
@@ -725,6 +733,7 @@ def run():
                       pygame.display.update()   
                       MoviePlay( Material.lose_mp4 )
                       show_init = True
+                      Make_Leaderboard(player.score)
               
               hits = pygame.sprite.groupcollide(attackObstacles_down, attackObstacles_up, False, False)
               if len(attackObstacles_up) > len(hits) :
@@ -739,9 +748,11 @@ def run():
                   pygame.display.update()   
                   MoviePlay( Material.win_mp4 ) 
                   show_init = True
+                  Make_Leaderboard(player.score)
 
             #   pygame.display.update()
 
+      
       pygame.quit()
 
 
