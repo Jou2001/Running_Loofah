@@ -29,6 +29,8 @@ bullets = pygame.sprite.Group()
 attackObstacles = pygame.sprite.Group()
 attackObstacles_down = pygame.sprite.Group()
 attackObstacles_up = pygame.sprite.LayeredUpdates()
+grounds = pygame.sprite.LayeredUpdates()
+a_player = pygame.sprite.LayeredUpdates()
 
 cap = []
 # initial
@@ -313,16 +315,23 @@ class Player(pygame.sprite.Sprite) :
         self.keydown = 0
         self.keyattack = 0   
         self.mask = pygame.mask.from_surface(self.image)  
+        self.end_ground_size = 406*Material.COMMOM_R
+        self.end = 0
+        self.small = 0.9
 
     def update(self) :
         self.mode_jump = RecognitionSquat.main(cap)
         self.mode_down = RecognitionSquatDown.main(cap)
         self.mode_attack = RecognitionAttack.main(cap)
         self.change_post()
-        
-        self.jump()
-        self.down()
-        self.shoot()
+        if self.end == 0 :
+            self.jump()
+            self.down()
+            self.shoot()
+        elif self.end == 1 :
+            print("small player")
+            self.ending_minify()
+            print(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
  
     def change_post(self) :
         self.run_time += 1
@@ -428,6 +437,15 @@ class Player(pygame.sprite.Sprite) :
             all_sprites.add(bullet)
             bullets.add(bullet)
 
+    def ending_minify(self) :
+        #self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale( self.image, (self.rect.width*self.small, self.rect.height*self.small) )
+        self.rect.y = Material.PLAYER_Y + self.rect.height*0.1 + self.end_ground_size*0.1
+        print("???? y : ", str(self.rect.bottom), str(self.rect.y), str(self.rect.height*0.1), str(self.end_ground_size*0.1) )
+        self.end_ground_size = self.end_ground_size*0.9
+        self.small = self.small * 0.9
+
+
 class Bullet(pygame.sprite.Sprite) :
     def __init__(self, x, y) :
         pygame.sprite.Sprite.__init__(self)
@@ -461,11 +479,33 @@ class Ground(pygame.sprite.Sprite) :
         self.rect.x = 0
         self.rect.bottom = Material.HEIGHT + int(60*Material.COMMOM_R)
         self.speed_X = 10
+        self.end = 0
+        self.diff = 0
+        self.small = 0.9
 
     def update(self) :
         self.rect.x -= self.speed_X
+
+        if self.end == 1 :
+            print("small ground")
+            self.ending_minify()
+            print(self.rect.x, self.rect.y)
+
         if self.rect.right <= 0 :
-            self.rect.x = (Material.GROUND_NUM-1)*(int(420*Material.COMMOM_R)) + self.rect.right
+            if self.end == 0 :
+                self.rect.x = (Material.GROUND_NUM-1)*(int(420*Material.COMMOM_R)) + self.rect.right
+            else :
+                self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
+    
+    def ending_minify(self) :
+        #self.rect = self.image.get_rect()
+        self.image = pygame.transform.scale( self.image, (int(420*self.small), int(406*self.small)) )
+        self.diff = self.rect.width*0.1
+        self.small = self.small * 0.9
+    
+    def end_get_rect(self) :
+        self.rect = self.image.get_rect()
+
 
 class Cloud(pygame.sprite.Sprite) :
     def __init__(self) :
@@ -537,9 +577,70 @@ def draw_health(surf, hp, x, y ):
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
 def end_animate() :
-    running = True
-    #while (running) :
-     #   if 
+    global all_sprites, grounds, a_player
+
+    size = 1
+    while (size <= 8) :    
+        # get input
+        timer.tick(fps)
+        screen.blit(Material.background4_img, (0,0))
+        for i in range(1, len(grounds)) :
+            grounds.get_sprite(i).end = 1
+        grounds.update()
+
+        a_player.get_sprite(0).end = 1
+        a_player.update()
+
+        diff = grounds.get_sprite(0).diff
+        for i in range(1, len(grounds)) :
+            grounds.get_sprite(i).rect.x = grounds.get_sprite(i).rect.x - diff
+            diff = diff + grounds.get_sprite(i).diff
+
+        while grounds.get_sprite(len(grounds)-1).rect.right <= Material.WIDTH :
+            ground = Ground()
+            ground.rect.x = grounds.get_sprite(len(grounds)-1).rect.right
+            ground.end = 1
+            ground.diff = grounds.get_sprite(len(grounds)-1).diff
+            ground.small = grounds.get_sprite(len(grounds)-1).small
+            ground.image = pygame.transform.scale( ground.image, (int(420*ground.small/0.9), int(406*ground.small/0.9)) )
+            Material.GROUND_NUM = Material.GROUND_NUM + 1
+            grounds.add(ground)
+        
+        a_player.draw(screen)
+        grounds.draw(screen)
+
+        pygame.display.update()
+
+        size = size + 1
+
+    screen.blit(Material.background4_img, (0,0))
+    time = 0
+    past = pygame.time.get_ticks()
+
+    for i in range(1, len(grounds)) :
+        grounds.get_sprite(i).end = 2
+    grounds.update()
+
+    a_player.get_sprite(0).end = 2
+    a_player.update()
+
+    pygame.display.update()
+
+    while time != 10 :
+        timer.tick(fps)
+        time, past = times_1(time, past)
+        screen.blit(Material.background1_img, (0,0))
+        
+        a_player.update()
+        grounds.update()
+        a_player.draw(screen)
+        grounds.draw(screen)
+
+        for event in pygame.event.get() :
+          if event.type == pygame.QUIT :
+            pygame.quit()
+
+        pygame.display.update()
 
 def run():
     global cap, all_sprites, attackObstacles, attackObstacles_down, attackObstacles_up
@@ -591,6 +692,7 @@ def run():
                     ground = Ground()
                     ground.rect.x = ground.rect.x + total_len
                     all_sprites.add(ground)
+                    grounds.add(ground)
                     total_len = total_len + int(420*Material.COMMOM_R)
 
                 count = random.randrange( 1, 3 )
@@ -606,6 +708,7 @@ def run():
                     back_sprites.add(o)
 
                 player = Player()
+                a_player.add(player)
                 all_sprites.add(player)
 
 
@@ -647,7 +750,6 @@ def run():
               # display
               screen.blit(Material.background4_img, (0,0))
               backornot = random.randrange( 0, 60 )
-              
               if backornot == 4 :
                 o = Cloud()
                 back_sprites.add(o)
@@ -710,11 +812,15 @@ def run():
               pygame.sprite.groupcollide(attackObstacles, bullets, True, True)
               hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_mask) # 注意碰撞範圍
               for hit in hits :               
-                  player.health -= hit.energy
-                  if player.health <= 0 :
+                  #player.health -= hit.energy
+                  if player.health <= 0 : # death
                       screen.blit(Material.background1_img, (0,0))
                       pygame.display.update()   
                       MoviePlay( Material.lose_mp4 )
+                      all_sprites.clear(screen, screen)
+                      grounds.clear(screen, screen)
+                      a_player.clear(screen, screen)
+                      back_sprites.clear(screen, screen)
                       show_init = True
               
               hits = pygame.sprite.groupcollide(attackObstacles_down, attackObstacles_up, False, False)
@@ -725,10 +831,16 @@ def run():
                         attackObstacles_up.get_sprite(i).size = 0.7
                         attackObstacles_up.get_sprite(i).change_y = 0
                   
+              # successful
               if len(obstacles) == 0 and time > GAME_TIME and player.health > 0:
+                    end_animate() 
                     screen.blit(Material.background1_img, (0,0))
                     pygame.display.update()   
                     MoviePlay( Material.win_mp4 ) 
+                    all_sprites.clear(screen, screen)
+                    grounds.clear(screen, screen)
+                    a_player.clear(screen, screen)
+                    back_sprites.clear(screen, screen)
                     show_init = True
 
               pygame.display.update()
