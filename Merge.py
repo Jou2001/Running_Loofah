@@ -501,10 +501,10 @@ class Ground(pygame.sprite.Sprite) :
             elif self.end == 1 :
                 pass
             elif self.end == 2 :
-                #pass
+                pass
                 #if self.rect.x <= -self.rect.width:
                   #self.rect.x = self.lastPost
-                self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
+                  #self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
               
     
     def ending_minify(self) :
@@ -584,7 +584,7 @@ def end_animate() :
     global all_sprites, grounds, a_player
 
     #計算地板要加幾塊
-    add_ground_num = int( Material.WIDTH / int( np.power(0.9, 6) * int(420*Material.COMMOM_R))) + 2 - Material.GROUND_NUM
+    add_ground_num = int( Material.WIDTH / int( np.power(0.9, 6) * int(420*Material.COMMOM_R))) + 1 - Material.GROUND_NUM
 
     # sort
     index_max = 0
@@ -631,12 +631,13 @@ def end_animate() :
     past = pygame.time.get_ticks()
 
     time = 0
+    x_last_gd = len(grounds) - 1
     while time != 20 :
         timer.tick(fps)
         time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
         print(time)
-        if time < 12 :
+        if time < 6 :
           for i in range(len(grounds)):
               if i <= mid :
                 Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )  
@@ -659,12 +660,13 @@ def end_animate() :
         else:
             for i in range(len(grounds)):   
                 gd = grounds.get_sprite(i)
-                if time == 12:
+                if time == 6:
                   gd.end = 2
                 
                 if gd.rect.x <= -gd.rect.width:
-                    gd = grounds.get_sprite(len(grounds)-1)
-                
+                    gd.rect.x = grounds.get_sprite(x_last_gd).rect.right
+                    x_last_gd = i
+
             grounds.update()
 
         grounds.draw(screen)
