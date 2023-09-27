@@ -508,22 +508,7 @@ class Ground(pygame.sprite.Sprite) :
 
     
     def ending_minify(self) :
-        self.diff = (self.rect.width) * 0.1 + self.diff
-        self.rect.x = self.rect.x - self.diff          
-        self.image = pygame.transform.scale( self.image, (self.rect.width*0.9, self.rect.height*0.9) )
-        x = self.rect.x 
-        bottom = self.rect.bottom
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.bottom = bottom
-        '''
-        self.small = self.small * 0.9
-        self.image = pygame.transform.scale( self.image, (int(420*Material.COMMOM_R*self.small), int(406*Material.COMMOM_R*self.small)) )
-       
-        self.sum_height = self.sum_height + self.diff
-        self.rect.y = self.end_height + self.sum_height
-        self.diff = self.rect.width * 0.1
-        #print(self.rect.x, self.rect.y)
+        pass
         '''
     
 
@@ -660,18 +645,16 @@ def end_animate() :
               Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )  
 
         if time != pre_time :
-          diff = 0
           for i in range(len(grounds)):   
               gd = grounds.get_sprite(i) 
-              if i > 0 :
-                diff = gd.rect.width * 0.1 + diff   
               gd.image = pygame.transform.scale( gd.image, (gd.rect.width*0.9, gd.rect.height*0.9) )
-              gd.rect.x = gd.rect.x - diff      
               x = gd.rect.x
               bottom = gd.rect.bottom
               gd.rect = gd.image.get_rect()
               gd.rect.x = x
               gd.rect.bottom = bottom
+              if i > 0 :       
+                gd.rect.x = grounds.get_sprite(i-1).rect.right
               
           pre_time = time
 
