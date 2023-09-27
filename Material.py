@@ -163,3 +163,8 @@ hint_attack = pygame.transform.scale( intro_attack, (63*COMMOM_R, 102*COMMOM_R) 
 hint_jump = pygame.transform.scale( intro_jump, (75*COMMOM_R, 105*COMMOM_R) ) # 340*590
 hint_slip = pygame.transform.scale( intro_slip_1, (84*COMMOM_R, 90*COMMOM_R) ) # 560*600
 
+
+leaderboard = pygame.image.load(os.path.join("rank/Leaderboard", "newLeaderboard.png")).convert()
+leaderboard = pygame.transform.scale( leaderboard, (S_WIDTH, S_HEIGHT) )
+# leaderboard = pygame.transform.scale( leaderboard, (1920*COMMOM_R, 1080*COMMOM_R) ) # 560*600
+
