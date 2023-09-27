@@ -486,6 +486,7 @@ class Ground(pygame.sprite.Sprite) :
         self.small = 1
         self.end_height = Material.HEIGHT + int(60*Material.COMMOM_R) - self.rect.height
         self.sum_height = 0
+        self.lastPost = 0
 
     def update(self) :
         if self.end != 1 :
@@ -499,13 +500,12 @@ class Ground(pygame.sprite.Sprite) :
                 self.rect.x = (Material.GROUND_NUM-1)*(int(420*Material.COMMOM_R)) + self.rect.right
             elif self.end == 1 :
                 pass
-                #self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
-                #print("1. ", str(self.rect.width), str(self.rect.right), str(self.rect.y))
             elif self.end == 2 :
+                #pass
+                #if self.rect.x <= -self.rect.width:
+                  #self.rect.x = self.lastPost
                 self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
-                self.rect.y = self.end_height + self.sum_height
-                #print("2. ", str(self.rect.width), str(self.rect.right), str(self.rect.y))
-
+              
     
     def ending_minify(self) :
         pass
@@ -584,7 +584,7 @@ def end_animate() :
     global all_sprites, grounds, a_player
 
     #計算地板要加幾塊
-    add_ground_num = int( Material.WIDTH / int( np.power(0.9, 6) * int(420*Material.COMMOM_R))) + 1 - Material.GROUND_NUM
+    add_ground_num = int( Material.WIDTH / int( np.power(0.9, 6) * int(420*Material.COMMOM_R))) + 2 - Material.GROUND_NUM
 
     # sort
     index_max = 0
@@ -630,32 +630,42 @@ def end_animate() :
     screen.blit(Material.background4_img, (0,0))
     past = pygame.time.get_ticks()
 
-
-    while time < 6 :
-        
+    time = 0
+    while time != 20 :
         timer.tick(fps)
-        time, past = times_1(time, past)
+        time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
         print(time)
-        for i in range(len(grounds)):
-            if i <= mid :
-              Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )  
-            else:  
-              Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )  
+        if time < 12 :
+          for i in range(len(grounds)):
+              if i <= mid :
+                Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )  
+              else:  
+                Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )  
 
-        if time != pre_time :
-          for i in range(len(grounds)):   
-              gd = grounds.get_sprite(i) 
-              gd.image = pygame.transform.scale( gd.image, (gd.rect.width*0.9, gd.rect.height*0.9) )
-              x = gd.rect.x
-              bottom = gd.rect.bottom
-              gd.rect = gd.image.get_rect()
-              gd.rect.x = x
-              gd.rect.bottom = bottom
-              if i > 0 :       
-                gd.rect.x = grounds.get_sprite(i-1).rect.right
-              
-          pre_time = time
+          if time != pre_time :
+            for i in range(len(grounds)):   
+                gd = grounds.get_sprite(i) 
+                gd.image = pygame.transform.scale( gd.image, (gd.rect.width*0.9, gd.rect.height*0.9) )
+                x = gd.rect.x
+                bottom = gd.rect.bottom
+                gd.rect = gd.image.get_rect()
+                gd.rect.x = x
+                gd.rect.bottom = bottom
+                if i > 0 :       
+                  gd.rect.x = grounds.get_sprite(i-1).rect.right
+                
+            pre_time = time
+        else:
+            for i in range(len(grounds)):   
+                gd = grounds.get_sprite(i)
+                if time == 12:
+                  gd.end = 2
+                
+                if gd.rect.x <= -gd.rect.width:
+                    gd = grounds.get_sprite(len(grounds)-1)
+                
+            grounds.update()
 
         grounds.draw(screen)
         #a_player.draw(screen)
