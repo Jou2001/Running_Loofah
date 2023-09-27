@@ -488,7 +488,8 @@ class Ground(pygame.sprite.Sprite) :
         self.sum_height = 0
 
     def update(self) :
-        self.rect.x -= self.speed_X
+        if self.end != 1 :
+          self.rect.x -= self.speed_X
 
         if self.end == 1 :
             print("small ground")
@@ -498,7 +499,8 @@ class Ground(pygame.sprite.Sprite) :
             if self.end == 0 :
                 self.rect.x = (Material.GROUND_NUM-1)*(int(420*Material.COMMOM_R)) + self.rect.right
             elif self.end == 1 :
-                self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
+                pass
+                #self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
                 #print("1. ", str(self.rect.width), str(self.rect.right), str(self.rect.y))
             elif self.end == 2 :
                 self.rect.x = (Material.GROUND_NUM-1)*(int(self.rect.width)) + self.rect.right
@@ -507,9 +509,9 @@ class Ground(pygame.sprite.Sprite) :
 
     
     def ending_minify(self) :
-        #self.rect = self.image.get_rect()
         self.small = self.small * 0.9
         self.image = pygame.transform.scale( self.image, (int(420*Material.COMMOM_R*self.small), int(406*Material.COMMOM_R*self.small)) )
+        self.rect = self.image.get_rect()
         self.sum_height = self.sum_height + self.diff
         self.rect.y = self.end_height + self.sum_height
         self.diff = self.rect.width * 0.1
@@ -591,6 +593,7 @@ def end_animate() :
 
     size = 1
     last = len(grounds)
+   
     while (size <= 6) :    
         # get input
         timer.tick(fps)
@@ -603,14 +606,15 @@ def end_animate() :
 
         a_player.get_sprite(0).end = 1
         a_player.update()
-
+        
+        '''
         index = 0
+
         x = grounds.get_sprite(0).rect.x
         for i in range(1, len(grounds)) :
             if x > grounds.get_sprite(i).rect.x :
                 x = grounds.get_sprite(i).rect.x
                 index = i
-            
 
         for i in range(index, len(grounds)) :
             grounds.move_to_front(grounds.get_sprite(len(grounds) - 1))
@@ -619,7 +623,15 @@ def end_animate() :
         for i in range(0, len(grounds)) :
             grounds.get_sprite(i).rect.x = grounds.get_sprite(i).rect.x - diff
             diff = diff + grounds.get_sprite(i).diff
-        
+        '''      
+
+        for i in range(len(grounds)):
+            if i == 0:
+              grounds.get_sprite(i).rect.x = 0
+            else :
+              grounds.get_sprite(i).rect.x = grounds.get_sprite(i+1).rect.right
+
+
         index = len(grounds)-1
         diff = grounds.get_sprite(0).diff
 
@@ -630,7 +642,8 @@ def end_animate() :
             ground.end_height = grounds.get_sprite(0).end_height 
             ground.sum_height = grounds.get_sprite(0).sum_height
             ground.diff = grounds.get_sprite(0).diff
-            ground.rect.bottomleft = grounds.get_sprite(index).rect.bottomright - diff
+            ground.rect.x = grounds.get_sprite(index).rect.right - diff
+            ground.rect.y = grounds.get_sprite(index).rect.y
             ground.end = 1
             grounds.add(ground)
             index = len(grounds)-1
@@ -669,7 +682,7 @@ def end_animate() :
 
     index = []
     for i in range(len(grounds)) :
-        if grounds.get_sprite(i).right <= 0 :
+        if grounds.get_sprite(i).rect.right <= 0 :
             index.append(i)
             
     l = Material.GROUND_NUM - len(index)
