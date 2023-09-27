@@ -509,7 +509,6 @@ class Ground(pygame.sprite.Sprite) :
     
     def ending_minify(self) :
         pass
-        '''
     
 
 class Cloud(pygame.sprite.Sprite) :
