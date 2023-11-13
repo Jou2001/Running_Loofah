@@ -2,13 +2,9 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-# cam = cv2.VideoCapture(0)
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
 pose = mp_pose.Pose()
-# status = False
-# h = 0
-# w = 0
 
 def is_hand_raised(wrist, shoulder):
     return wrist.y <= shoulder.y
@@ -49,7 +45,7 @@ def main(cam):
         hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
         hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
 
-        # 计算角度
+        
         angle_left_hand = angle_between_points(wrist_left, elbow_left, shoulder_left)
         angle_right_hand = angle_between_points(wrist_right, elbow_right, shoulder_right)
         angle_left_shoulder = angle_between_points(elbow_left, shoulder_left, hip_left)   
@@ -59,16 +55,13 @@ def main(cam):
 
 
         if ( (angle_left_hand <= 180 and angle_left_hand >= 150 ) and (angle_left_shoulder <= 180 and angle_left_shoulder >= 150 ) and (left_hand_raised and not right_hand_raised)) :
-        #    print( "PlayAgain")
            return "PlayAgain"
         
-        elif( (angle_right_hand <= 180 and angle_right_hand >= 150 ) and (angle_right_shoulder <= 180 and angle_right_shoulder >= 150 ) and (right_hand_raised and not left_hand_raised)) : # 綠色 標準動作
-            # print( "End")
+        elif( (angle_right_hand <= 180 and angle_right_hand >= 150 ) and (angle_right_shoulder <= 180 and angle_right_shoulder >= 150 ) and (right_hand_raised and not left_hand_raised)) : 
             return "End"
                 
         else :
             return 3
-            # print( "3")
 
 if __name__ == '__main__':
     main()
