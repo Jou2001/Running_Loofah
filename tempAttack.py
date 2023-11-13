@@ -10,7 +10,10 @@ status = False
 h = 0
 w = 0
 
- 
+def is_hand_raised(wrist, shoulder):
+    # 如果手腕的垂直位置（y坐标）低于肩膀，则认为手没有举起
+    return wrist.y <= shoulder.y
+
 def angle_between_points(a, b, c):
     ba = np.array([a.x - b.x, a.y - b.y, a.z - b.z])
     bc = np.array([c.x - b.x, c.y - b.y, c.z - b.z])
@@ -40,13 +43,15 @@ def main():
         if not ret:
             print("Read Error")
             break
-        frame = cv2.flip(frame, 1) #矩陣左右翻轉   ******
+        # frame = cv2.flip(frame, 1) #矩陣左右翻轉   ******
         rgbframe = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = pose.process(rgbframe) # 從影像增測姿勢    
+        results = pose.process(rgbframe) # 從影像增測姿勢   
+        frame = cv2.flip(frame, 1) #矩陣左右翻轉   ****** 
         h, w, _ = frame.shape # (480, 640, 3)
         preview = frame.copy()
 
         if results.pose_world_landmarks:
+            # mp_drawing.draw_landmarks(preview, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
             # Hand
             wrist_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST]
             wrist_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]
@@ -54,35 +59,32 @@ def main():
             elbow_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW]
             shoulder_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
             shoulder_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
-
-            # Leg
             hip_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
-            knee_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_KNEE]
             hip_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
-            knee_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_KNEE]
-            ankle_left = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE]
-            ankle_right = results.pose_world_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
 
             # 计算角度
             angle_left_hand = angle_between_points(wrist_left, elbow_left, shoulder_left)
             angle_right_hand = angle_between_points(wrist_right, elbow_right, shoulder_right)
-            angle_left_knee = angle_between_points(hip_left, knee_left, ankle_left)
-            angle_right_knee = angle_between_points(hip_right, knee_right, ankle_right)
+            angle_left_shoulder = angle_between_points(elbow_left, shoulder_left, hip_left)   
+            angle_right_shoulder = angle_between_points(elbow_right, shoulder_right, hip_right)
 
+            # 判断每只手是否举起
+            left_hand_raised = is_hand_raised(wrist_left, shoulder_left)
+            right_hand_raised = is_hand_raised(wrist_right, shoulder_right)
+
+            if ( (angle_left_hand <= 180 and angle_left_hand >= 150 ) and (angle_left_shoulder <= 180 and angle_left_shoulder >= 150 ) and (left_hand_raised and not right_hand_raised)) :
+                print( "PlayAgain")
+            #    return "PlayAgain"
+                # print( "PlayAgain")
             
-            if (angle_left_knee >= 90 and angle_left_knee <= 120) and \
-            (angle_right_knee >= 90 and angle_right_knee <= 120) and \
-            (angle_left_hand <= 180 and angle_left_hand >= 150) and (angle_right_hand <= 180 and angle_right_hand >= 150): # 綠色 標準動作
-                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (1400, 920)
-                            , cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA
-                            )
-                 
-            elif (( angle_left_knee >= 80 and angle_left_knee <= 90 ) or (angle_left_knee > 120 and angle_left_knee < 130)) and \
-            ( ( angle_right_knee >= 80 and angle_right_knee <= 90 ) or (angle_right_knee > 120 and angle_right_knee < 130)): # 黃色
-                cv2.putText(preview, "Left Angle: {:f} ".format(angle_left_knee), (400, 360), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 255), 1, cv2.LINE_AA)
-
-            else:
-                cv2.putText(preview, "Left Angle: {:f}".format(angle_left_knee), (1400, 920), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA)
+            elif( (angle_right_hand <= 180 and angle_right_hand >= 150 ) and (angle_right_shoulder <= 180 and angle_right_shoulder >= 150 ) and (right_hand_raised and not left_hand_raised)) : # 綠色 標準動作
+                print( "End")
+                # return "End"
+                # print( "End")
+                    
+            else :
+                # return 3
+                print( "3")
 
         cv2.imshow('frame', preview)
         

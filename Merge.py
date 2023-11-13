@@ -9,6 +9,7 @@ import RecognitionSquat
 import RecognitionSquatDown
 import RecognitionAttack
 import RecongnitionNext
+import PlayAgainOrEnd
 import HeadPlusBody
 import Material
 import numpy as np
@@ -553,7 +554,75 @@ def show_hint(action):
         # jump_action = pygame.transform.scale( intro_jump, (50, 70) ) # 340*590
         # screen.blit(jump_action, (135,60))
         # draw_text( screen, "Jump!", 50, 80, 60 )
+
+def PlayAgain():
+    global cap
+    screen.blit(Material.background1_img, (0,0))
+    key_pressed = pygame.key.get_pressed()
+    time = 0
+    past = pygame.time.get_ticks()
+    count = 0
+    p = -1
+
+    active = 1
+    waiting = True
+    while waiting :
+        mode_next = PlayAgainOrEnd.main(cap)
+        ret, img = cap.read()
+        time, past = times_1(time, past)
+
+        if time % 1 == 0 and p != time :
+            count += 1
+            p = time
+
+        if not ret:
+            print("Cannot receive frame")
+            exit()
         
+        timer.tick(fps)
+        
+        pygame.display.update()
+
+        if active == 1:
+            if count % 2 == 0 :
+                screen.blit(Material.intro_handup_left, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H))) # 200*340 
+            else :
+                screen.blit(Material.intro_handup_right, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
+            
+            Material.draw_text( screen, 'Raise Left Hand To Play Again', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE )
+            Material.draw_text( screen, 'Raise Right Hand To End The Game ', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10+int(100*Material.COMMOM_R), WHITE )
+            # Material.draw_text( screen, "Raise Left Hand To Play Again", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
+
+        else:
+            waiting = False
+
+        for event in pygame.event.get() :
+            if event.type == pygame.QUIT :
+                pygame.quit()
+            # if event.type == pygame.KEYDOWN :
+            #    if event.key == pygame.K_UP :
+            #        active += 1
+        preview = img.copy() 
+        
+        rgbframe = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+        
+        results = pose.process(rgbframe) # 從影像增測姿勢
+        
+        preview = cv2.resize(preview,(int(preview.shape[1]*1.2*Material.COMMOM_R_W),int(preview.shape[0]*1.2*Material.COMMOM_R_H)))
+
+        
+        preview = np.rot90(preview)   
+        preview = cv2.cvtColor(preview, cv2.COLOR_BGR2RGB)
+        preview = pygame.surfarray.make_surface(preview)
+        screen.blit(preview, ( int(900*Material.COMMOM_R_W), int(400*Material.COMMOM_R_H) ) )
+
+        key_pressed = pygame.key.get_pressed() 
+
+        if mode_next == "End":
+            return False
+        elif mode_next == "PlayAgain":
+            return True
+   
 
 def run():
     global cap, all_sprites, attackObstacles, attackObstacles_down, attackObstacles_up
@@ -694,33 +763,33 @@ def run():
               if player.mode_jump == 1 or player.keyjump == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
-                  player.score += 5
+                  if changeTime : player.score += 5
               elif player.mode_jump == 2 or player.keyjump == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
-                  player.score += 3
+                  if changeTime : player.score += 3
               elif player.mode_jump == 3 or player.keyjump == 0 :
                   Material.draw_text( screen, "Bad Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
                   
               if player.mode_down == 1 or player.keydown == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
-                  player.score += 5
+                  if changeTime : player.score += 5
               elif player.mode_down == 2 or player.keydown == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
-                  player.score += 3
+                  if changeTime : player.score += 3
               elif player.mode_down == 3 or player.keydown == 0 :
                   Material.draw_text( screen, "Bad Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
                   
               if player.mode_attack == 1 or player.keyattack == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
-                  player.score += 5
+                  if changeTime : player.score += 5
               elif player.mode_attack == 2 or player.keyattack == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
-                  player.score += 3
+                  if changeTime : player.score += 3
               elif player.mode_attack == 3 or player.keyattack == 0 :
                   Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
 
@@ -733,7 +802,7 @@ def run():
                       pygame.display.update()   
                       MoviePlay( Material.lose_mp4 )
                       show_init = True
-                      Make_Leaderboard(player.score)
+                    #   Make_Leaderboard(player.score)
               
               hits = pygame.sprite.groupcollide(attackObstacles_down, attackObstacles_up, False, False)
               if len(attackObstacles_up) > len(hits) :
@@ -748,12 +817,20 @@ def run():
                   pygame.display.update()   
                   MoviePlay( Material.win_mp4 ) 
                   show_init = True
-                  Make_Leaderboard(player.score)
+                #   Make_Leaderboard(player.score)
+              
+              if time == 0 or player.health <= 0 :
+                Make_Leaderboard(player.score)
+                if not PlayAgain():
+                    running = False
+                    # show_Leaderboard()
+                    
 
             #   pygame.display.update()
 
       
       pygame.quit()
+      sys.exit()
 
 
 if __name__ == '__main__':
