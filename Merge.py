@@ -591,7 +591,6 @@ def PlayAgain():
             
             Material.draw_text( screen, 'Raise Left Hand To Play Again', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE )
             Material.draw_text( screen, 'Raise Right Hand To End The Game ', int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10+int(100*Material.COMMOM_R), WHITE )
-            # Material.draw_text( screen, "Raise Left Hand To Play Again", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
 
         else:
             waiting = False
@@ -623,6 +622,21 @@ def PlayAgain():
         elif mode_next == "PlayAgain":
             return True
    
+def ShowLeaderboard():
+    pygame.mixer.music.stop()
+    pygame.mixer.stop()
+    Material.leaderboard_mp3.play()  
+    screen.blit(Material.leaderboard, (0,0))
+    pygame.display.update()
+    time = 0
+    past = pygame.time.get_ticks()
+
+    while time != 4 :
+        timer.tick(fps)
+        time, past = times_1(time, past)
+        screen.blit(Material.leaderboard, (0,0))
+
+        pygame.display.update()
 
 def run():
     global cap, all_sprites, attackObstacles, attackObstacles_down, attackObstacles_up
@@ -823,6 +837,7 @@ def run():
                 Make_Leaderboard(player.score)
                 if not PlayAgain():
                     running = False
+                    ShowLeaderboard()
                     # show_Leaderboard()
                     
 

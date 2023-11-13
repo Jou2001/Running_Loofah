@@ -120,7 +120,7 @@ lose_mp4 = VideoFileClip(os.path.join("video", "lose_mp3.mp4")).resize((WIDTH,HE
 camera_mp3 = pygame.mixer.Sound(os.path.join("mp3", "cameraMusic.mp3"))
 jump_mp3 = pygame.mixer.Sound(os.path.join("mp3", "jumpMusic.mp3"))
 good_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Good.mp3"))
-
+leaderboard_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Leaderboard.mp3"))
 
 load_image = []
 player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha() # 470*256
@@ -163,8 +163,7 @@ hint_attack = pygame.transform.scale( intro_attack, (63*COMMOM_R, 102*COMMOM_R) 
 hint_jump = pygame.transform.scale( intro_jump, (75*COMMOM_R, 105*COMMOM_R) ) # 340*590
 hint_slip = pygame.transform.scale( intro_slip_1, (84*COMMOM_R, 90*COMMOM_R) ) # 560*600
 
-
 leaderboard = pygame.image.load(os.path.join("rank/Leaderboard", "newLeaderboard.png")).convert()
 leaderboard = pygame.transform.scale( leaderboard, (S_WIDTH, S_HEIGHT) )
-# leaderboard = pygame.transform.scale( leaderboard, (1920*COMMOM_R, 1080*COMMOM_R) ) # 560*600
+
 
