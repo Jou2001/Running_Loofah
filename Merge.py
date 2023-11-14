@@ -323,23 +323,23 @@ class Player(pygame.sprite.Sprite) :
         self.mode_jump = RecognitionSquat.main(cap)
         self.mode_down = RecognitionSquatDown.main(cap)
         self.mode_attack = RecognitionAttack.main(cap)
-        self.change_post()
+        self.change_post() # update pose
         if self.end == 0 :
             self.jump()
             self.down()
             self.shoot()
-        elif self.end == 1 :
+        elif self.end == 1 : # minimum player
             print("small player")
-            self.ending_minify()
-            print(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
+            self.image = pygame.transform.scale( self.image, (359*Material.COMMOM_R*self.small/0.9, 433*Material.COMMOM_R*self.small/0.9) )
+            # print(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
+        elif self.end == 2 : # maintain player's size
+            self.image = pygame.transform.scale( self.image, (359*Material.COMMOM_R*self.small/0.9, 433*Material.COMMOM_R*self.small/0.9) ) 
  
-    def change_post(self) :
+    def change_post(self) : # update pose
         self.run_time += 1
         if self.run_time == 16 :
             self.run_time = 0
-        self.image = Material.load_image[self.run_time]
-        if self.end == 2 :
-            self.image = pygame.transform.scale( self.image, (359*Material.COMMOM_R*self.small/0.9, 433*Material.COMMOM_R*self.small/0.9) ) 
+        self.image = Material.load_image[self.run_time] # update pose
 
     def count_jump(self) :
         self.countJump -= 1
@@ -440,12 +440,7 @@ class Player(pygame.sprite.Sprite) :
             bullets.add(bullet)
 
     def ending_minify(self) :
-        #self.rect = self.image.get_rect()
         self.image = pygame.transform.scale( self.image, (359*Material.COMMOM_R*self.small, 433*Material.COMMOM_R*self.small) )
-        #print("???? y : ", str(self.rect.bottom), str(self.rect.y), str(433*Material.COMMOM_R*self.small*0.1), str(self.end_ground_size*0.1) )
-        self.end_ground_size = self.end_ground_size*0.9
-        self.rect.y = self.rect.y + 433*Material.COMMOM_R*self.small*0.1 + self.end_ground_size*0.1
-        self.small = self.small * 0.9
 
 
 class Bullet(pygame.sprite.Sprite) :
@@ -592,6 +587,8 @@ def end_animate() :
     index_min = 0
     x_min = grounds.get_sprite(0).rect.x
     grounds.get_sprite(0).end = 1
+    a_player.get_sprite(0).end = 1
+
     for i in range(1, len(grounds)) :
         grounds.get_sprite(i).end = 1
         if x_max < grounds.get_sprite(i).rect.x :
@@ -621,7 +618,6 @@ def end_animate() :
         total_len = total_len + 420*Material.COMMOM_R
  
     # 角色縮小
-    a_player.get_sprite(0).end = 1
     a_player.update() 
   
     # 地板縮小 、 填補空隙(前進) 
@@ -657,7 +653,12 @@ def end_animate() :
                   gd.rect.x = grounds.get_sprite(i-1).rect.right
                 
             pre_time = time
+            a_player.get_sprite(0).small = a_player.get_sprite(0).small * 0.9
+            a_player.get_sprite(0).end_ground_size = a_player.get_sprite(0).end_ground_size*0.9
+            a_player.get_sprite(0).rect.y = a_player.get_sprite(0).rect.y + 433*Material.COMMOM_R*a_player.get_sprite(0).small*0.1 + a_player.get_sprite(0).end_ground_size*0.1
+
         else:
+            a_player.get_sprite(0).end = 2
             for i in range(len(grounds)):   
                 gd = grounds.get_sprite(i)
                 if time == 6:
@@ -669,8 +670,11 @@ def end_animate() :
 
             grounds.update()
 
+        # 角色縮小
+        a_player.update() 
+
         grounds.draw(screen)
-        #a_player.draw(screen)
+        a_player.draw(screen)
 
         for event in pygame.event.get() :
           if event.type == pygame.QUIT :
@@ -678,130 +682,6 @@ def end_animate() :
 
         pygame.display.update()
 
-'''
-    while (size <= 6) :    
-        # get input
-        timer.tick(fps)
-        screen.blit(Material.background4_img, (0,0))
-        Material.draw_text( screen, "1" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(160*Material.COMMOM_R), WHITE )
-              
-        for i in range(0, len(grounds)) :
-            grounds.get_sprite(i).end = 1
-        grounds.update()
-
-        a_player.get_sprite(0).end = 1
-        a_player.update()
-        
-        index = 0
-
-        x = grounds.get_sprite(0).rect.x
-        for i in range(1, len(grounds)) :
-            if x > grounds.get_sprite(i).rect.x :
-                x = grounds.get_sprite(i).rect.x
-                index = i
-
-        for i in range(index, len(grounds)) :
-            grounds.move_to_front(grounds.get_sprite(len(grounds) - 1))
-
-        diff = grounds.get_sprite(0).diff
-        for i in range(0, len(grounds)) :
-            grounds.get_sprite(i).rect.x = grounds.get_sprite(i).rect.x - diff
-            diff = diff + grounds.get_sprite(i).diff
-   
-
-        for i in range(len(grounds)):
-            if i == 0:
-              grounds.get_sprite(i).rect.x = 0
-            else :
-              grounds.get_sprite(i).rect.x = grounds.get_sprite(i+1).rect.right
-
-
-        index = len(grounds)-1
-        diff = grounds.get_sprite(0).diff
-
-        while grounds.get_sprite(index).rect.right <= Material.WIDTH :
-            ground = Ground()
-            ground.small = grounds.get_sprite(index).small
-            ground.image = pygame.transform.scale( ground.image, (int(420*Material.COMMOM_R*ground.small), int(406*Material.COMMOM_R*ground.small)) )
-            ground.end_height = grounds.get_sprite(0).end_height 
-            ground.sum_height = grounds.get_sprite(0).sum_height
-            ground.diff = grounds.get_sprite(0).diff
-            ground.rect.x = grounds.get_sprite(index).rect.right - diff
-            ground.rect.y = grounds.get_sprite(index).rect.y
-            ground.end = 1
-            grounds.add(ground)
-            index = len(grounds)-1
-            Material.GROUND_NUM = Material.GROUND_NUM + 1
-            diff = diff + grounds.get_sprite(0).diff
-
-        for i in range(len(grounds)) :
-            if i < last :
-              Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )
-              Material.draw_text( screen, str(Material.GROUND_NUM) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(460*Material.COMMOM_R), WHITE )
-            else :
-              Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )
-              Material.draw_text( screen, str(Material.GROUND_NUM) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(460*Material.COMMOM_R), BLACK )
-                
-
-        grounds.draw(screen)
-        a_player.draw(screen)
-
-        pygame.display.update()
-
-        size = size + 1
-
-
-    screen.blit(Material.background4_img, (0,0))
-    time = 0
-    past = pygame.time.get_ticks()
-
-    for i in range(1, len(grounds)) :
-        grounds.get_sprite(i).end = 2
-    grounds.update()
-
-    a_player.get_sprite(0).end = 2
-    a_player.update()
-
-    pygame.display.update()
-
-    index = []
-    for i in range(len(grounds)) :
-        if grounds.get_sprite(i).rect.right <= 0 :
-            index.append(i)
-            
-    l = Material.GROUND_NUM - len(index)
-    for i in range(len(index)) :
-        if i > 0 :
-            grounds.get_sprite(i).bottomleft = grounds.get_sprite(i-1).bottomright
-        elif i == 0 :
-            grounds.get_sprite(i).bottomleft = grounds.get_sprite(len(grounds-1)).bottomright
-
-    while time != 20 :
-        timer.tick(fps)
-        time, past = times_1(time, past)
-        screen.blit(Material.background4_img, (0,0))
-        
-        Material.draw_text( screen, "2" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(160*Material.COMMOM_R), WHITE )
-
-        for i in range(len(grounds)) :
-            if i < last :
-              Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )
-              Material.draw_text( screen, str(Material.GROUND_NUM) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(460*Material.COMMOM_R), WHITE )
-            else :
-              Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )
-              Material.draw_text( screen, str(Material.GROUND_NUM) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(460*Material.COMMOM_R), BLACK )
-            
-        a_player.update()
-        grounds.update()
-        a_player.draw(screen)
-        grounds.draw(screen)
-
-        for event in pygame.event.get() :
-          if event.type == pygame.QUIT :
-            pygame.quit()
-
-        pygame.display.update()
-'''  
 def run():
     global cap, all_sprites, attackObstacles, attackObstacles_down, attackObstacles_up
 
@@ -815,11 +695,11 @@ def run():
         print("Cannot open camera")
         exit()
     else :
-      pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
-      pygame.mixer_music.play()
+      #pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
+      #pygame.mixer_music.play()
       #draw_start()
       #draw_intro()
-
+      
       o = Sun()
       back_sprites.add(o)
 
@@ -830,13 +710,14 @@ def run():
           if show_init :
                 # open camera
                 if not pygame.mixer.music.get_busy() :
-                    pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
-                    pygame.mixer_music.play()
+                    # pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
+                    # pygame.mixer_music.play()
+                    pass
 
                 draw_init()
                 
-                pygame.mixer_music.load(os.path.join("mp3", "game_music.mp3"))
-                pygame.mixer_music.play()
+                # pygame.mixer_music.load(os.path.join("mp3", "game_music.mp3"))
+                # pygame.mixer_music.play()
                 # init timer
                 time = 0
                 now = pygame.time.get_ticks()
@@ -870,7 +751,6 @@ def run():
                 player = Player()
                 a_player.add(player)
                 all_sprites.add(player)
-
 
           for event in pygame.event.get() :
               if event.type == pygame.QUIT :
