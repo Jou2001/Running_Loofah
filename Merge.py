@@ -633,11 +633,12 @@ def end_animate() :
     height_change = 0.015
     height_g = 0.005
     up_down = 1 # 0: go up 1: go down
-    while time != 20 :
+    stop = 0
+    while time != 25 :
         timer.tick(fps)
         time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
-        print(time)
+        # print(time)
         if num < 6 :
           # init ground's x
           for i in range(len(grounds)):
@@ -690,9 +691,15 @@ def end_animate() :
             a_player.get_sprite(0).end = 2
             # player go ahead
             if a_player.get_sprite(0).rect.x < Material.WIDTH * 0.8 :
-                a_player.get_sprite(0).rect.x = a_player.get_sprite(0).rect.x + int(10*Material.COMMOM_R_W)
+                a_player.get_sprite(0).rect.x += int(20*Material.COMMOM_R_W)
             if a_player.get_sprite(0).rect.x >= Material.WIDTH * 0.8 :
                 a_player.get_sprite(0).rect.x = Material.WIDTH * 0.8
+                # player go up 
+                a_player.get_sprite(0).rect.y -= int(10*Material.COMMOM_R_W)
+                if a_player.get_sprite(0).rect.y <= Material.HEIGHT * 0.21 :
+                    a_player.clear(screen, screen)
+                    stop = 1
+
 
             # ground go ahead
             for i in range(len(grounds)):   
@@ -705,14 +712,16 @@ def end_animate() :
                     x_last_gd = i
 
             grounds.update()
-            screen.blit(Material.end_UFO, (Material.WIDTH * displacement,Material.HEIGHT * height))
 
         num = num + 1
         # 角色縮小
-        a_player.update() 
-
         grounds.draw(screen)
-        a_player.draw(screen)
+        if stop == 0 :
+            a_player.update() 
+            a_player.draw(screen)
+
+        if num >= 6 :
+            screen.blit(Material.end_UFO, (Material.WIDTH * displacement,Material.HEIGHT * height))
 
         for event in pygame.event.get() :
           if event.type == pygame.QUIT :
@@ -917,7 +926,6 @@ def run():
                     MoviePlay( Material.win_mp4 ) 
                     all_sprites.clear(screen, screen)
                     grounds.clear(screen, screen)
-                    a_player.clear(screen, screen)
                     back_sprites.clear(screen, screen)
                     show_init = True
 
