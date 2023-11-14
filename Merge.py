@@ -622,26 +622,30 @@ def end_animate() :
   
     # 地板縮小 、 填補空隙(前進) 
     time = 0
-    pre_time = 0
     screen.blit(Material.background4_img, (0,0))
     past = pygame.time.get_ticks()
 
     time = 0
     x_last_gd = len(grounds) - 1
     num = 1
+    displacement = 1
+    height = 0.2 # go down
+    height_change = 0.015
+    height_g = 0.005
+    up_down = 1 # 0: go up 1: go down
     while time != 20 :
         timer.tick(fps)
         time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
         print(time)
         if num < 6 :
+          # init ground's x
           for i in range(len(grounds)):
               if i <= mid :
                 Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )  
               else:  
                 Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )  
-
-          # if time != pre_time :
+          # add new grounds
           for i in range(len(grounds)):   
             gd = grounds.get_sprite(i) 
             gd.image = pygame.transform.scale( gd.image, (gd.rect.width*0.9, gd.rect.height*0.9) )
@@ -652,13 +656,37 @@ def end_animate() :
             gd.rect.bottom = bottom
             if i > 0 :       
                 gd.rect.x = grounds.get_sprite(i-1).rect.right
-            
-          pre_time = time
+     
+          # minimum player's size and y
           a_player.get_sprite(0).small = a_player.get_sprite(0).small * 0.9
           a_player.get_sprite(0).end_ground_size = a_player.get_sprite(0).end_ground_size*0.9
           a_player.get_sprite(0).rect.y = a_player.get_sprite(0).rect.y + 433*Material.COMMOM_R*a_player.get_sprite(0).small*0.1 + a_player.get_sprite(0).end_ground_size*0.1
 
         else:
+            # UFO x
+            displacement = displacement * 0.95
+            if displacement < 0.73 :
+                displacement = 0.73
+            # UFO y
+            height -= height_change
+            height_change -= height_g
+            if height >= 0.2 :
+                height = 0.2
+            if height <= 0.18 :
+                height = 0.18
+
+            if up_down == 1 :
+                if height == 0.2 and height_change <= 0 :
+                    height_change = -0.015
+                    height_g = -height_g
+                    up_down = 0
+            elif up_down == 0 :
+                if height == 0.18 and height_change >= 0 :
+                    height_change = 0.015
+                    height_g = -height_g
+                    up_down = 1
+
+            # player maintain size
             a_player.get_sprite(0).end = 2
             # player go ahead
             if a_player.get_sprite(0).rect.x < Material.WIDTH * 0.8 :
@@ -666,6 +694,7 @@ def end_animate() :
             if a_player.get_sprite(0).rect.x >= Material.WIDTH * 0.8 :
                 a_player.get_sprite(0).rect.x = Material.WIDTH * 0.8
 
+            # ground go ahead
             for i in range(len(grounds)):   
                 gd = grounds.get_sprite(i)
                 if num == 6:
@@ -676,6 +705,7 @@ def end_animate() :
                     x_last_gd = i
 
             grounds.update()
+            screen.blit(Material.end_UFO, (Material.WIDTH * displacement,Material.HEIGHT * height))
 
         num = num + 1
         # 角色縮小
