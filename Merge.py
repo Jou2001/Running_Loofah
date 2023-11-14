@@ -322,6 +322,7 @@ class Player(pygame.sprite.Sprite) :
         self.jump()
         self.down()
         self.shoot()
+        
  
     def change_post(self) :
         self.run_time += 1
@@ -759,6 +760,8 @@ def run():
               draw_health(screen, player.health, int(120*Material.COMMOM_R_W), int(64*Material.COMMOM_R_H) )
               screen.blit(Material.healthstate_head, (int(20*Material.COMMOM_R_W),int(20*Material.COMMOM_R_H)))
               
+              Material.draw_text( screen, "Score: " + str(player.score), int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
+              
               # timer
               #time, past = times_2(time, past)
               time, past = times_2(time, past, player)
@@ -777,33 +780,45 @@ def run():
               if player.mode_jump == 1 or player.keyjump == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
-                  if changeTime : player.score += 5
+                  if changeTime : 
+                      player.score += 10
+                      Material.draw_text( screen, "+10", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_jump == 2 or player.keyjump == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
-                  if changeTime : player.score += 3
+                  if changeTime : 
+                      player.score += 5
+                      Material.draw_text( screen, "+5", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_jump == 3 or player.keyjump == 0 :
                   Material.draw_text( screen, "Bad Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
                   
               if player.mode_down == 1 or player.keydown == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
-                  if changeTime : player.score += 5
+                  if changeTime :
+                    player.score += 5
+                    Material.draw_text( screen, "+5", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_down == 2 or player.keydown == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
-                  if changeTime : player.score += 3
+                  if changeTime :
+                    player.score += 3
+                    Material.draw_text( screen, "+3", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_down == 3 or player.keydown == 0 :
                   Material.draw_text( screen, "Bad Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
                   
               if player.mode_attack == 1 or player.keyattack == 1 :
               #if player.key_pressed[pygame.K_UP] :
                   Material.draw_text( screen, "Good Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
-                  if changeTime : player.score += 5
+                  if changeTime :
+                    player.score += 15
+                    Material.draw_text( screen, "+15", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_attack == 2 or player.keyattack == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
                   Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
-                  if changeTime : player.score += 3
+                  if changeTime :
+                    player.score += 8
+                    Material.draw_text( screen, "+8", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
               elif player.mode_attack == 3 or player.keyattack == 0 :
                   Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
 
@@ -811,6 +826,8 @@ def run():
               hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_mask) # 注意碰撞範圍
               for hit in hits :               
                   player.health -= hit.energy
+                  player.score -= 5
+                  Material.draw_text( screen, "-5", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
                   if player.health <= 0 :
                       screen.blit(Material.background1_img, (0,0))
                       pygame.display.update()   
@@ -831,15 +848,12 @@ def run():
                   pygame.display.update()   
                   MoviePlay( Material.win_mp4 ) 
                   show_init = True
-                #   Make_Leaderboard(player.score)
               
               if time == 0 or player.health <= 0 :
                 Make_Leaderboard(player.score)
                 if not PlayAgain():
                     running = False
                     ShowLeaderboard()
-                    # show_Leaderboard()
-                    
 
             #   pygame.display.update()
 
