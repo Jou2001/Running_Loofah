@@ -628,13 +628,15 @@ def end_animate() :
     time = 0
     x_last_gd = len(grounds) - 1
     num = 1
-    displacement = 1
+    displacement = 10*Material.COMMOM_R_H
     height = 0.2 # go down
     height_change = 0.015
     height_g = 0.005
     up_down = 1 # 0: go up 1: go down
     stop = 0
-    while time != 25 :
+    x_UFO = Material.WIDTH
+    
+    while time != 20 :
         timer.tick(fps)
         time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
@@ -665,9 +667,12 @@ def end_animate() :
 
         else:
             # UFO x
-            displacement = displacement * 0.95
-            if displacement < 0.73 :
-                displacement = 0.73
+            if stop == 1 :
+                displacement = -10*Material.COMMOM_R_H
+
+            x_UFO = x_UFO - displacement
+            if x_UFO < Material.WIDTH * 0.72 :
+                x_UFO = Material.WIDTH * 0.72
             # UFO y
             height -= height_change
             height_change -= height_g
@@ -691,7 +696,7 @@ def end_animate() :
             a_player.get_sprite(0).end = 2
             # player go ahead
             if a_player.get_sprite(0).rect.x < Material.WIDTH * 0.8 :
-                a_player.get_sprite(0).rect.x += int(20*Material.COMMOM_R_W)
+                a_player.get_sprite(0).rect.x += int(15*Material.COMMOM_R_W)
             if a_player.get_sprite(0).rect.x >= Material.WIDTH * 0.8 :
                 a_player.get_sprite(0).rect.x = Material.WIDTH * 0.8
                 # player go up 
@@ -721,7 +726,7 @@ def end_animate() :
             a_player.draw(screen)
 
         if num >= 6 :
-            screen.blit(Material.end_UFO, (Material.WIDTH * displacement,Material.HEIGHT * height))
+            screen.blit(Material.end_UFO, (x_UFO, Material.HEIGHT * height))
 
         for event in pygame.event.get() :
           if event.type == pygame.QUIT :
