@@ -149,11 +149,14 @@ obstacle.append( image )
 end_pig = []
 for i in range(0,3) :
     image = pygame.image.load(os.path.join("img", "End_pig-" + str(i+1) + ".png")).convert_alpha()
-    image = pygame.transform.scale( image, (820*COMMOM_R*0.665, 570*COMMOM_R*0.665) ) # 野豬 820*570
-    obstacle.append( image )
+    image = pygame.transform.scale( image, (820*COMMOM_R*0.665*(0.9**6), 570*COMMOM_R*0.665*(0.9**6)) ) # 野豬 820*570
+    end_pig.append( image )
+image = pygame.image.load(os.path.join("img", "End_pig-" + str(2) + ".png")).convert_alpha()
+image = pygame.transform.scale( image, (820*COMMOM_R*0.665*(0.9**6), 570*COMMOM_R*0.665*(0.9**6)) ) # 野豬 820*570
+end_pig.append( image )
 
 end_chicken = pygame.image.load(os.path.join("img", "End_chicken.png")).convert_alpha()
-end_chicken = pygame.transform.scale( end_chicken, (2048*COMMOM_R*0.25, 2048*COMMOM_R*0.25) ) # 飛天雞 2048*2048
+end_chicken = pygame.transform.scale( end_chicken, (2048*COMMOM_R*0.25*(0.9**6), 2048*COMMOM_R*0.25*(0.9**6)) ) # 飛天雞 2048*2048
 
 end_UFO = pygame.image.load(os.path.join("img", "UFO.png")).convert_alpha()
 end_UFO = pygame.transform.scale( end_UFO, (517*COMMOM_R, 435*COMMOM_R) ) # UFO 517*435

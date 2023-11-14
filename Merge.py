@@ -627,7 +627,9 @@ def end_animate() :
 
     time = 0
     x_last_gd = len(grounds) - 1
+    # minimum frequency
     num = 1
+    # UFO
     displacement = 10*Material.COMMOM_R_H
     height = 0.2 # go down
     height_change = 0.015
@@ -635,8 +637,15 @@ def end_animate() :
     up_down = 1 # 0: go up 1: go down
     stop = 0
     x_UFO = Material.WIDTH
-    
-    while time != 20 :
+    # obstacle
+    pig_num = -1 # 0 ~ 3
+    pig = Material.end_pig[0]
+    chick = Material.end_chicken
+    ob_p_x = -30*Material.COMMOM_R
+    ob_p_y = ground.rect.y + 20 * Material.COMMOM_R
+    ob_ch_x = -200*Material.COMMOM_R
+    ob_ch_y = Material.HEIGHT * 0.3
+    while time != 18 :
         timer.tick(fps)
         time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
@@ -696,7 +705,7 @@ def end_animate() :
             a_player.get_sprite(0).end = 2
             # player go ahead
             if a_player.get_sprite(0).rect.x < Material.WIDTH * 0.8 :
-                a_player.get_sprite(0).rect.x += int(15*Material.COMMOM_R_W)
+                a_player.get_sprite(0).rect.x += int(18*Material.COMMOM_R_W)
             if a_player.get_sprite(0).rect.x >= Material.WIDTH * 0.8 :
                 a_player.get_sprite(0).rect.x = Material.WIDTH * 0.8
                 # player go up 
@@ -717,7 +726,18 @@ def end_animate() :
                     x_last_gd = i
 
             grounds.update()
-
+            if num > 7 :
+                pig_num += 1 
+                if pig_num > 3 :
+                    pig_num = 0
+                print(len(Material.end_pig),pig_num)
+                pig = Material.end_pig[pig_num]
+                screen.blit(pig, (ob_p_x, ob_p_y))
+                ob_p_x += 10*Material.COMMOM_R
+            if num > 13 :
+                screen.blit(chick, (ob_ch_x, ob_ch_y))
+                ob_ch_x += 10*Material.COMMOM_R
+                
         num = num + 1
         # 角色縮小
         grounds.draw(screen)
