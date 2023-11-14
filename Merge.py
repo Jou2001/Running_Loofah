@@ -628,40 +628,47 @@ def end_animate() :
 
     time = 0
     x_last_gd = len(grounds) - 1
+    num = 1
     while time != 20 :
         timer.tick(fps)
         time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
         print(time)
-        if time < 6 :
+        if num < 6 :
           for i in range(len(grounds)):
               if i <= mid :
                 Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )  
               else:  
                 Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )  
 
-          if time != pre_time :
-            for i in range(len(grounds)):   
-                gd = grounds.get_sprite(i) 
-                gd.image = pygame.transform.scale( gd.image, (gd.rect.width*0.9, gd.rect.height*0.9) )
-                x = gd.rect.x
-                bottom = gd.rect.bottom
-                gd.rect = gd.image.get_rect()
-                gd.rect.x = x
-                gd.rect.bottom = bottom
-                if i > 0 :       
-                  gd.rect.x = grounds.get_sprite(i-1).rect.right
-                
-            pre_time = time
-            a_player.get_sprite(0).small = a_player.get_sprite(0).small * 0.9
-            a_player.get_sprite(0).end_ground_size = a_player.get_sprite(0).end_ground_size*0.9
-            a_player.get_sprite(0).rect.y = a_player.get_sprite(0).rect.y + 433*Material.COMMOM_R*a_player.get_sprite(0).small*0.1 + a_player.get_sprite(0).end_ground_size*0.1
+          # if time != pre_time :
+          for i in range(len(grounds)):   
+            gd = grounds.get_sprite(i) 
+            gd.image = pygame.transform.scale( gd.image, (gd.rect.width*0.9, gd.rect.height*0.9) )
+            x = gd.rect.x
+            bottom = gd.rect.bottom
+            gd.rect = gd.image.get_rect()
+            gd.rect.x = x
+            gd.rect.bottom = bottom
+            if i > 0 :       
+                gd.rect.x = grounds.get_sprite(i-1).rect.right
+            
+          pre_time = time
+          a_player.get_sprite(0).small = a_player.get_sprite(0).small * 0.9
+          a_player.get_sprite(0).end_ground_size = a_player.get_sprite(0).end_ground_size*0.9
+          a_player.get_sprite(0).rect.y = a_player.get_sprite(0).rect.y + 433*Material.COMMOM_R*a_player.get_sprite(0).small*0.1 + a_player.get_sprite(0).end_ground_size*0.1
 
         else:
             a_player.get_sprite(0).end = 2
+            # player go ahead
+            if a_player.get_sprite(0).rect.x < Material.WIDTH * 0.8 :
+                a_player.get_sprite(0).rect.x = a_player.get_sprite(0).rect.x + int(10*Material.COMMOM_R_W)
+            if a_player.get_sprite(0).rect.x >= Material.WIDTH * 0.8 :
+                a_player.get_sprite(0).rect.x = Material.WIDTH * 0.8
+
             for i in range(len(grounds)):   
                 gd = grounds.get_sprite(i)
-                if time == 6:
+                if num == 6:
                   gd.end = 2
                 
                 if gd.rect.x <= -gd.rect.width:
@@ -670,6 +677,7 @@ def end_animate() :
 
             grounds.update()
 
+        num = num + 1
         # 角色縮小
         a_player.update() 
 
