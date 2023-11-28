@@ -18,7 +18,7 @@ from moviepy.editor import *
 import mediapipe as mp
 from Ranking import Make_Leaderboard
 
-GAME_TIME = 5
+GAME_TIME = 30
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -47,6 +47,7 @@ PURPLE = (238, 130, 238) # 紫色
 GREEN = (101,221,146) # 65DD92
 YELLO = (248,218,110) # F8DA6E
 RED = (248,141,110) # F88D6E
+RED_1 = (255,0,0)
 screen = pygame.display.set_mode((Material.S_WIDTH, Material.S_HEIGHT), pygame.FULLSCREEN) # create screen
 pygame.display.set_caption('Running loofah') # 開始前標題
 # define speed
@@ -118,8 +119,7 @@ def draw_start() :
 def draw_intro() :
     global cap
 
-    #ReadVideo(do_the_following_mp4, "PLEASE DO THE FOLLOWING", 50)
-    #Material.do_the_following_mp4.preview() 
+    # Material.do_the_following_mp4.preview() 
     MoviePlay( Material.do_the_following_mp4 )
 
    
@@ -251,7 +251,7 @@ def draw_init() :
     pygame.display.update()
     faceOK = HeadPlusBody.Photograph( screen, fps, timer, cap ) 
 
-
+    Material.start321_mp3.play()
     MoviePlay( Material.start321_mp4 ) 
 
     Material.load_image = []
@@ -355,8 +355,14 @@ class Player(pygame.sprite.Sprite) :
 
         if key_pressed[pygame.K_UP] :
             self.keyjump = 1
-        if key_pressed[pygame.K_RIGHT] :
+            self.keydown = 0
+            self.keyattack = 0  
+        elif key_pressed[pygame.K_w] :
             self.keyjump = 2
+            self.keydown = 0
+            self.keyattack = 0  
+        else :
+            self.keyjump = 0
             
         if (self.mode_jump == 1 and self.change_y == 0 and self.countJump >= 0 and self.isGoodJump >= 2) or \
            (key_pressed[pygame.K_UP] and self.change_y == 0 and self.countJump >= 0) : # key_pressed[pygame.K_RIGHT]
@@ -399,6 +405,17 @@ class Player(pygame.sprite.Sprite) :
         if self.mode_down == 3:
             self.isGoodDown = 0
 
+        if key_pressed[pygame.K_DOWN] :
+            self.keyjump = 0
+            self.keydown = 1
+            self.keyattack = 0  
+        elif key_pressed[pygame.K_s] :
+            self.keyjump = 0
+            self.keydown = 2
+            self.keyattack = 0
+        else :
+            self.keydown = 0
+
         if (self.mode_down == 1 and self.change_y == 0 and self.countdown >= 0 and self.isGoodDown >= 2) or \
            (key_pressed[pygame.K_DOWN] and self.countdown >= 0) : # key_pressed[pygame.K_RIGHT]
             self.countdown = Material.PLAYER_DOWN
@@ -424,6 +441,17 @@ class Player(pygame.sprite.Sprite) :
             self.isGoodAttack += 1
         if self.mode_attack == 3:
             self.isGoodAttack = 0
+
+        if key_pressed[pygame.K_LEFT] :
+            self.keyjump = 0
+            self.keydown = 0
+            self.keyattack = 1  
+        elif key_pressed[pygame.K_a] :
+            self.keyjump = 0
+            self.keydown = 0
+            self.keyattack = 2  
+        else:
+            self.keyattack = 0
 
         if (self.mode_attack == 1 and self.countattack >= 0 and self.isGoodAttack >= 2) or \
            (key_pressed[pygame.K_LEFT]) :
@@ -665,7 +693,9 @@ def PlayAgain():
 def ShowLeaderboard():
     pygame.mixer.music.stop()
     pygame.mixer.stop()
-    Material.leaderboard_mp3.play()  
+    Material.leaderboard_mp3.play() 
+    Material.leaderboard = pygame.image.load(os.path.join("rank/Leaderboard", "newLeaderboard.png")).convert()
+    Material.leaderboard = pygame.transform.scale( Material.leaderboard, (Material.S_WIDTH, Material.S_HEIGHT) ) 
     screen.blit(Material.leaderboard, (0,0))
     pygame.display.update()
     time = 0
@@ -685,21 +715,19 @@ def end_animate() :
     add_ground_num = int( Material.WIDTH / int( np.power(0.9, 6) * int(420*Material.COMMOM_R))) + 1 - Material.GROUND_NUM
 
     # sort
-    index_max = 0
     x_max = grounds.get_sprite(0).rect.x
-    index_min = 0
     x_min = grounds.get_sprite(0).rect.x
     grounds.get_sprite(0).end = 1
     a_player.get_sprite(0).end = 1
+    if a_player.get_sprite(0).rect.y < Material.PLAYER_Y :
+        a_player.get_sprite(0).rect.y = Material.PLAYER_Y
 
     for i in range(1, len(grounds)) :
         grounds.get_sprite(i).end = 1
         if x_max < grounds.get_sprite(i).rect.x :
             x_max = grounds.get_sprite(i).rect.x
-            index_max = i
         if x_min > grounds.get_sprite(i).rect.x :
             x_min = grounds.get_sprite(i).rect.x
-            index_min = i
 
     #for i in range(index_min, len(grounds)) :
     #    grounds.move_to_back(grounds.get_sprite(len(grounds) - 1))
@@ -709,7 +737,6 @@ def end_animate() :
         else :
           grounds.get_sprite(i).rect.x = grounds.get_sprite(i-1).rect.right
 
-    mid = len(grounds) - 1
     # add new grounds
     total_len = grounds.get_sprite(len(grounds)-1).rect.right
     for i in range(add_ground_num+1):
@@ -779,6 +806,7 @@ def end_animate() :
           a_player.get_sprite(0).small = a_player.get_sprite(0).small * 0.9
           a_player.get_sprite(0).end_ground_size = a_player.get_sprite(0).end_ground_size*0.9
           a_player.get_sprite(0).rect.y = a_player.get_sprite(0).rect.y + 433*Material.COMMOM_R*a_player.get_sprite(0).small*0.1 + a_player.get_sprite(0).end_ground_size*0.1
+          
 
         else:
             # UFO x
@@ -873,10 +901,10 @@ def run():
         print("Cannot open camera")
         exit()
     else :
-    #   pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
-    #   pygame.mixer_music.play()
-    #   draw_start()
-    #   draw_intro()
+      pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
+      pygame.mixer_music.play()
+      draw_start()
+      draw_intro()
 
       o = Sun()
       back_sprites.add(o)
@@ -888,14 +916,16 @@ def run():
           if show_init :
                 # open camera
                 if not pygame.mixer.music.get_busy() :
-                    # pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
-                    # pygame.mixer_music.play()
+                    pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
+                    pygame.mixer_music.set_volume(0.1)
+                    pygame.mixer_music.play()
                     pass
 
                 draw_init()
                 
-                # pygame.mixer_music.load(os.path.join("mp3", "game_music.mp3"))
-                # pygame.mixer_music.play()
+                pygame.mixer_music.load(os.path.join("mp3", "game_music.mp3"))
+                pygame.mixer_music.set_volume(0.1)
+                pygame.mixer_music.play()
                 # init timer
                 time = 0
                 now = pygame.time.get_ticks()
@@ -1001,61 +1031,70 @@ def run():
               player.key_pressed = pygame.key.get_pressed()
               if player.mode_jump == 1 or player.keyjump == 1 :
               #if player.key_pressed[pygame.K_UP] :
-                  Material.draw_text( screen, "Good Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "Good Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), PINHONG )
+                  Material.draw_text( screen, "Good Jump!" , int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), RED_1 )
                   if changeTime : 
                       player.score += 10
-                      Material.draw_text( screen, "+10", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                      Material.draw_text( screen, "+10", int(60*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), RED_1 )
               elif player.mode_jump == 2 or player.keyjump == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
-                  Material.draw_text( screen, "So so Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "So so Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
                   if changeTime : 
                       player.score += 5
-                      Material.draw_text( screen, "+5", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                      Material.draw_text( screen, "+5", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), YELLO )
               elif player.mode_jump == 3 or player.keyjump == 0 :
-                  Material.draw_text( screen, "Bad Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "Bad Jump!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE )
+                  pass
                   
               if player.mode_down == 1 or player.keydown == 1 :
               #if player.key_pressed[pygame.K_UP] :
-                  Material.draw_text( screen, "Good Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "Good Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), PINHONG )
+                  Material.draw_text( screen, "Good Slip!" , int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), RED_1 )
                   if changeTime :
                     player.score += 5
-                    Material.draw_text( screen, "+5", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                    Material.draw_text( screen, "+5", int(60*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), RED_1 )
               elif player.mode_down == 2 or player.keydown == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
-                  Material.draw_text( screen, "So so Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "So so Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
                   if changeTime :
                     player.score += 3
-                    Material.draw_text( screen, "+3", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                    Material.draw_text( screen, "+3", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), YELLO )
               elif player.mode_down == 3 or player.keydown == 0 :
-                  Material.draw_text( screen, "Bad Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "Bad Slip!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                  pass
                   
               if player.mode_attack == 1 or player.keyattack == 1 :
               #if player.key_pressed[pygame.K_UP] :
-                  Material.draw_text( screen, "Good Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "Good Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), PINHONG )
+                  Material.draw_text( screen, "Good Attack!" , int(60*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), RED_1 )
                   if changeTime :
                     player.score += 15
-                    Material.draw_text( screen, "+15", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                    Material.draw_text( screen, "+15", int(60*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), RED_1 )
               elif player.mode_attack == 2 or player.keyattack == 2 :
               #elif player.key_pressed[pygame.K_RIGHT] :
-                  Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "So so Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
                   if changeTime :
                     player.score += 8
-                    Material.draw_text( screen, "+8", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
+                    Material.draw_text( screen, "+8", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), YELLO )
               elif player.mode_attack == 3 or player.keyattack == 0 :
-                  Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
+                  # Material.draw_text( screen, "Bad Attack!" , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(120*Material.COMMOM_R), WHITE )
+                  pass
 
-              Material.draw_text( screen, str(len(obstacles)) , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(160*Material.COMMOM_R), WHITE )
+              # Material.draw_text( screen, str(len(obstacles)) , int(40*Material.COMMOM_R), Material.S_WIDTH/2, Material.BAR_HEIGHT + int(160*Material.COMMOM_R), WHITE )
 
               pygame.sprite.groupcollide(attackObstacles, bullets, True, True)
               hits = pygame.sprite.spritecollide(player, obstacles, True, pygame.sprite.collide_mask) # 注意碰撞範圍
               for hit in hits :               
-                #   player.health -= hit.energy
+                player.health -= hit.energy
                 player.score -= 5
                 Material.draw_text( screen, "-5", int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(80*Material.COMMOM_R), WHITE )
                 if player.health <= 0 : # death
                     screen.blit(Material.background1_img, (0,0))
-                    pygame.display.update()   
+                    pygame.mixer.music.stop()
+                    pygame.mixer.stop()
+                    Material.lose_mp3.play()           
                     MoviePlay( Material.lose_mp4 )
+                    
                     for shelf in all_sprites :
                         shelf.kill()
                     for shelf in grounds :
@@ -1081,8 +1120,12 @@ def run():
               if len(obstacles) == 0 and time > GAME_TIME and player.health > 0:
                     end_animate() 
                     screen.blit(Material.background1_img, (0,0))
-                    pygame.display.update()   
+                    pygame.display.update()  
+                    pygame.mixer.music.stop()
+                    pygame.mixer.stop()
+                    Material.win_mp3.play()
                     MoviePlay( Material.win_mp4 ) 
+                    
                     for shelf in all_sprites :
                         shelf.kill()
                     for shelf in grounds :

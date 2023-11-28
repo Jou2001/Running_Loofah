@@ -8,14 +8,13 @@ import mediapipe as mp
 import pyautogui
 import math
 
+# define color
 WHITE = (255, 255, 255)
 PURPLE = (171, 38, 201)
 # initial
 pygame.init()
 pygame.mixer.init()
 
-# define color
-WHITE = (255, 255, 255)
 # define screen size
 S_WIDTH, S_HEIGHT = pyautogui.size()
 COMMOM_R_W = S_WIDTH / 1920.0
@@ -121,6 +120,9 @@ camera_mp3 = pygame.mixer.Sound(os.path.join("mp3", "cameraMusic.mp3"))
 jump_mp3 = pygame.mixer.Sound(os.path.join("mp3", "jumpMusic.mp3"))
 good_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Good.mp3"))
 leaderboard_mp3 = pygame.mixer.Sound(os.path.join("mp3", "Leaderboard.mp3"))
+lose_mp3 = pygame.mixer.Sound(os.path.join("mp3", "lose.mp3"))
+win_mp3 = pygame.mixer.Sound(os.path.join("mp3", "win.mp3"))
+start321_mp3 = pygame.mixer.Sound(os.path.join("mp3", "321.mp3"))
 
 load_image = []
 player_slip_img = pygame.image.load(os.path.join("img", "player_slip.png")).convert_alpha() # 470*256
