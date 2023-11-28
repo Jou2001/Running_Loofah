@@ -18,7 +18,7 @@ from moviepy.editor import *
 import mediapipe as mp
 from Ranking import Make_Leaderboard
 
-GAME_TIME = 5
+GAME_TIME = 30
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -621,6 +621,8 @@ def PlayAgain():
         
         pygame.display.update()
 
+        screen.blit(Material.background1_img, (0,0))
+
         if active == 1:
             if count % 2 == 0 :
                 screen.blit(Material.intro_handup_left, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H))) # 200*340 
@@ -655,9 +657,9 @@ def PlayAgain():
 
         key_pressed = pygame.key.get_pressed() 
 
-        if mode_next == "End":
+        if mode_next == "End" or key_pressed[pygame.K_RIGHT] :
             return False
-        elif mode_next == "PlayAgain":
+        elif mode_next == "PlayAgain" or key_pressed[pygame.K_LEFT] :
             return True
    
 def ShowLeaderboard():
@@ -752,12 +754,14 @@ def end_animate() :
         screen.blit(Material.background4_img, (0,0))
         # print(time)
         if num < 6 :
+          '''
           # init ground's x
           for i in range(len(grounds)):
               if i <= mid :
                 Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), BLACK )  
               else:  
                 Material.draw_text( screen, str(i) + " " + str(grounds.get_sprite(i).rect.width) , int(40*Material.COMMOM_R), int(grounds.get_sprite(i).rect.x), Material.BAR_HEIGHT + int(400*Material.COMMOM_R), WHITE )  
+          '''
           # add new grounds
           for i in range(len(grounds)):   
             gd = grounds.get_sprite(i) 
