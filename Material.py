@@ -111,7 +111,7 @@ sun = pygame.transform.scale( sun, (200*COMMOM_R, 200*COMMOM_R) ) # 200*200
 
 #load mp4
 do_the_following_mp4 = VideoFileClip(os.path.join("video", "do_the_following.mp4")).resize((WIDTH,HEIGHT))
-start321_mp4 = VideoFileClip(os.path.join("video", "start321_mp3.mp4")).resize((WIDTH,HEIGHT))
+start321_mp4 = VideoFileClip(os.path.join("video", "start321.mp4")).resize((WIDTH,HEIGHT))
 win_mp4 = VideoFileClip(os.path.join("video", "win_mp3.mp4")).resize((WIDTH,HEIGHT))
 lose_mp4 = VideoFileClip(os.path.join("video", "lose_mp3.mp4")).resize((WIDTH,HEIGHT))
 
