@@ -18,7 +18,7 @@ from moviepy.editor import *
 import mediapipe as mp
 from Ranking import Make_Leaderboard
 
-GAME_TIME = 30
+GAME_TIME = 5
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -328,7 +328,7 @@ class Player(pygame.sprite.Sprite) :
             self.down()
             self.shoot()
         elif self.end == 1 : # minimum player
-            print("small player")
+            # print("small player")
             self.image = pygame.transform.scale( self.image, (359*Material.COMMOM_R*self.small/0.9, 433*Material.COMMOM_R*self.small/0.9) )
             # print(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
         elif self.end == 2 : # maintain player's size
@@ -748,6 +748,7 @@ def end_animate() :
     ob_p_y = ground.rect.y + 20 * Material.COMMOM_R
     ob_ch_x = -200*Material.COMMOM_R
     ob_ch_y = Material.HEIGHT * 0.3
+
     while time != 18 :
         timer.tick(fps)
         time, past = times_1(time, past)  
@@ -835,7 +836,7 @@ def end_animate() :
                 pig_num += 1 
                 if pig_num > 3 :
                     pig_num = 0
-                print(len(Material.end_pig),pig_num)
+                # print(len(Material.end_pig),pig_num)
                 pig = Material.end_pig[pig_num]
                 screen.blit(pig, (ob_p_x, ob_p_y))
                 ob_p_x += 10*Material.COMMOM_R
@@ -1055,10 +1056,17 @@ def run():
                     screen.blit(Material.background1_img, (0,0))
                     pygame.display.update()   
                     MoviePlay( Material.lose_mp4 )
-                    all_sprites.clear(screen, screen)
-                    grounds.clear(screen, screen)
-                    a_player.clear(screen, screen)
-                    back_sprites.clear(screen, screen)
+                    for shelf in all_sprites :
+                        shelf.kill()
+                    for shelf in grounds :
+                        shelf.kill()
+                    for shelf in back_sprites :
+                        shelf.kill()
+                    for shelf in a_player :
+                        shelf.kill()
+                   
+                    print(len(grounds))
+                    
                     show_init = True
               
               hits = pygame.sprite.groupcollide(attackObstacles_down, attackObstacles_up, False, False)
@@ -1075,16 +1083,22 @@ def run():
                     screen.blit(Material.background1_img, (0,0))
                     pygame.display.update()   
                     MoviePlay( Material.win_mp4 ) 
-                    all_sprites.clear(screen, screen)
-                    grounds.clear(screen, screen)
-                    back_sprites.clear(screen, screen)
+                    for shelf in all_sprites :
+                        shelf.kill()
+                    for shelf in grounds :
+                        shelf.kill()
+                    for shelf in back_sprites :
+                        shelf.kill()
+
+                    print(len(grounds))
                     show_init = True
               
               if (len(obstacles) == 0 and time > GAME_TIME and player.health > 0) or player.health <= 0 :
                 Make_Leaderboard(player.score)
+                ShowLeaderboard()
                 if not PlayAgain():
                     running = False
-                    ShowLeaderboard()
+                    
 
             #   pygame.display.update()
 
