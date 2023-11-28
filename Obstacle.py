@@ -34,7 +34,7 @@ class Jump_Obstacle(pygame.sprite.Sprite) : # 4.球 408*408
         if self.rect.right < 0:
             self.kill()
 
-        if self.rect.x < int(Material.S_WIDTH*5/12) and self.rect.x > int(Material.COMMOM_R_W/4):
+        if self.rect.x < int(Material.S_WIDTH/3) and self.rect.x > int(Material.COMMOM_R_W/4):
             show_hint("jump")
     
     def rotate(self) :
@@ -100,7 +100,7 @@ class Attack_Obstacle(pygame.sprite.Sprite) : # 1.蟲蟲 202*279  2.老鼠 281*3
         if self.rect.right < 0:
             self.kill()
 
-        if self.rect.x < int(Material.S_WIDTH*5/12) and self.rect.x > int(Material.COMMOM_R_W/4):
+        if self.rect.x < int(Material.S_WIDTH/3) and self.rect.x > int(Material.COMMOM_R_W/4):
             show_hint("attack")
         
 
@@ -140,7 +140,7 @@ class Slide_Obstacle(pygame.sprite.Sprite) : # 3.飛天雞 2048*2048
         if self.rect.right < 0:
             self.kill()
 
-        if self.rect.x < int(Material.S_WIDTH*5/12) and self.rect.x > int(Material.COMMOM_R_W/4):
+        if self.rect.x < int(Material.S_WIDTH/3) and self.rect.x > int(Material.COMMOM_R_W/4):
             show_hint("slip")
 
 def New_JumpObstacle(all_sprites, obstacles) :

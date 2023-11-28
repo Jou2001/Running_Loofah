@@ -85,6 +85,7 @@ def MoviePlay( mp4 ) :
     # 释放资源
     mp4.reader.close()
 
+# opening introduction screen (3s)
 def draw_start() :
     global cap
 
@@ -98,6 +99,7 @@ def draw_start() :
     while time != 3 :
         timer.tick(fps)
         time, past = times_1(time, past)
+        # opening introduction screen
         screen.blit(Material.background1_img, (0,0))
         txt_line = [ "在某一天，火星撞擊地球，", "一顆絲瓜因此長出手腳，", "開始奔跑起來，", "請協助絲瓜逃離變種生物的掌控，", "勇往直前吧!!", "In a cataclysmic event, Mars collided with Earth,", \
                         "Transforming a loofah with hands and feet,", "It races frantically,", "Help the loofah escape mutant creatures,", "Go all out!"]
@@ -116,29 +118,30 @@ def draw_start() :
 
         pygame.display.update()
 
+# movement exercises
 def draw_intro() :
     global cap
 
-    # Material.do_the_following_mp4.preview() 
     MoviePlay( Material.do_the_following_mp4 )
 
-   
     key_pressed = pygame.key.get_pressed()
     time = 0
     past = pygame.time.get_ticks()
-    count = 0
-    p = -1
+    count = 0 # record the frequency of changing pictures
+    p = -1 
 
     active = 1
     waiting = True
     while waiting :
+        # retrieve action status
         mode_jump = RecognitionSquat.main(cap)
         mode_down = RecognitionSquatDown.main(cap)
         mode_attack = RecognitionAttack.main(cap)
         mode_next = RecongnitionNext.main(cap)
         ret, img = cap.read()
+        # get the current seconds(time) and past seconds(past)
         time, past = times_1(time, past)
-
+        # every second count + 1
         if time % 1 == 0 and p != time :
             count += 1
             p = time
@@ -150,36 +153,37 @@ def draw_intro() :
         timer.tick(fps)
         screen.blit(Material.background1_img, (0,0))
 
+        # show current practice movements
         if active == 1 :
-            if count % 2 == 0 :
+            if count % 2 == 0 : # change picture every two seconds
               screen.blit(Material.intro_jump, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))              
             else :
               screen.blit(Material.intro_jump_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))        
 
             Material.draw_text( screen, "HOW TO JUMP", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 2 :
-            if count % 2 == 0 :
+            if count % 2 == 0 : # change picture every two seconds
               screen.blit(Material.intro_slip_1, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
             else :
               screen.blit(Material.intro_slip_1_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
 
             Material.draw_text( screen, "HOW TO SLIP No.1", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 3 :
-            if count % 2 == 0 :
+            if count % 2 == 0 : # change picture every two seconds
               screen.blit(Material.intro_slip_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
             else :
               screen.blit(Material.intro_slip_2_2, (int(200*Material.COMMOM_R_W),int(400*Material.COMMOM_R_H)))
 
             Material.draw_text( screen, "HOW TO SLIP No.2", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 4 :
-            if count % 2 == 0 :
+            if count % 2 == 0 : # change picture every two seconds
               screen.blit(Material.intro_attack, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
             else :
               screen.blit(Material.intro_attack_2, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
                 
             Material.draw_text( screen, "HOW TO ATTACK", int(100*Material.COMMOM_R), Material.S_WIDTH/2, Material.S_HEIGHT/10, WHITE ) # 60
         elif active == 5 :
-            if count % 2 == 0 :
+            if count % 2 == 0 : # change picture every two seconds
                 screen.blit(Material.intro_handup_left, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H))) # 200*340 
             else :
                 screen.blit(Material.intro_handup_right, (int(200*Material.COMMOM_R_W),int(340*Material.COMMOM_R_H)))
@@ -776,12 +780,13 @@ def end_animate() :
     ob_ch_x = -200*Material.COMMOM_R
     ob_ch_y = Material.HEIGHT * 0.3
 
-    while time != 18 :
+    end = False
+    while not end :
         timer.tick(fps)
         time, past = times_1(time, past)  
         screen.blit(Material.background4_img, (0,0))
-        # print(time)
-        if num < 6 :
+        # minimize ground and player
+        if num < 6 : 
           '''
           # init ground's x
           for i in range(len(grounds)):
@@ -807,16 +812,20 @@ def end_animate() :
           a_player.get_sprite(0).end_ground_size = a_player.get_sprite(0).end_ground_size*0.9
           a_player.get_sprite(0).rect.y = a_player.get_sprite(0).rect.y + 433*Material.COMMOM_R*a_player.get_sprite(0).small*0.1 + a_player.get_sprite(0).end_ground_size*0.1
           
-
+        # go ahead
         else:
-            # UFO x
+            # chicken out of frame so end the game
+            if ob_ch_x >= Material.WIDTH :
+                end = True
+
+            # set UFO x
             if stop == 1 :
                 displacement = -10*Material.COMMOM_R_H
 
             x_UFO = x_UFO - displacement
             if x_UFO < Material.WIDTH * 0.72 :
                 x_UFO = Material.WIDTH * 0.72
-            # UFO y
+            # set UFO y
             height -= height_change
             height_change -= height_g
             if height >= 0.2 :
@@ -840,14 +849,14 @@ def end_animate() :
             # player go ahead
             if a_player.get_sprite(0).rect.x < Material.WIDTH * 0.8 :
                 a_player.get_sprite(0).rect.x += int(18*Material.COMMOM_R_W)
+            # player is under the UFO and going to raise into UFO
             if a_player.get_sprite(0).rect.x >= Material.WIDTH * 0.8 :
                 a_player.get_sprite(0).rect.x = Material.WIDTH * 0.8
                 # player go up 
                 a_player.get_sprite(0).rect.y -= int(10*Material.COMMOM_R_W)
                 if a_player.get_sprite(0).rect.y <= Material.HEIGHT * 0.21 :
                     a_player.clear(screen, screen)
-                    stop = 1
-
+                    stop = 1 # UFO return
 
             # ground go ahead
             for i in range(len(grounds)):   
@@ -860,7 +869,8 @@ def end_animate() :
                     x_last_gd = i
 
             grounds.update()
-            if num > 7 :
+            # obstacle appear and chase the player
+            if num > 7 : # pig
                 pig_num += 1 
                 if pig_num > 3 :
                     pig_num = 0
@@ -868,7 +878,7 @@ def end_animate() :
                 pig = Material.end_pig[pig_num]
                 screen.blit(pig, (ob_p_x, ob_p_y))
                 ob_p_x += 10*Material.COMMOM_R
-            if num > 13 :
+            if num > 13 : # chicken
                 screen.blit(chick, (ob_ch_x, ob_ch_y))
                 ob_ch_x += 10*Material.COMMOM_R
                 
@@ -879,6 +889,7 @@ def end_animate() :
             a_player.update() 
             a_player.draw(screen)
 
+        # UFO appear
         if num >= 6 :
             screen.blit(Material.end_UFO, (x_UFO, Material.HEIGHT * height))
 
