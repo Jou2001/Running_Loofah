@@ -83,6 +83,7 @@ def save_scores(scores):
         for player_data in scores:
             file.write(f"{player_data['score']},{player_data['photo_path']}\n")
 
+# From another file to copy player's photo to destination file.
 def save_photo():
     number = str(find_missing_player_number())
 
