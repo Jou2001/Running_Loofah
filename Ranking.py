@@ -3,12 +3,14 @@ from PIL import Image, ImageDraw, ImageFont
 import Material
 import shutil
 
+# Compare with the score in score.txt to see if the player's score needs to be put in.
 def compare_score(score):
     file_path = "./rank/score.txt"
     
     if os.path.exists(file_path):
         with open(file_path, "r") as file:
             lines = file.readlines()
+            # The file is empty or the number of data entries is less than three.
             if not lines or len(lines) < 3:
                 return True
             
@@ -24,6 +26,7 @@ def compare_score(score):
     else:
         return True
 
+# Delete the lowest score in score.txt.
 def delete_lowest_score():
     file_path = "./rank/score.txt"
     
@@ -43,7 +46,8 @@ def delete_lowest_score():
                 with open(file_path, "w") as file:
                     for line in lines:
                         file.write(f"{line[0]},{line[1]}\n")
- 
+
+# Add new score and photo path to score.txt.
 def add_score(score):
     scores = load_score_data()[:2]
     photo_path = save_photo()
@@ -56,6 +60,7 @@ def add_score(score):
 
     save_scores(scores)
 
+# Get all data from score.txt. 
 def load_score_data():
     scores = []
     with open("./rank/score.txt", "r") as file:
@@ -72,11 +77,13 @@ def load_score_data():
                     scores.append(player_data)
     return scores
 
+# Save player's data to file.
 def save_scores(scores):
     with open("./rank/score.txt", "w") as file:  # 指定完整的文件路径
         for player_data in scores:
             file.write(f"{player_data['score']},{player_data['photo_path']}\n")
 
+# From another file to copy player's photo to destination file.
 def save_photo():
     number = str(find_missing_player_number())
 
@@ -113,6 +120,7 @@ def find_missing_player_number():
     
     return None
 
+# Get new data to make the leaderboard.
 def make_leaderboard():
     scores = load_score_data()
     leaderboard_path = './rank/Leaderboard/leaderboard.png'
@@ -129,16 +137,21 @@ def make_leaderboard():
             player_score = scores[i]["score"]
             player_photo = Image.open(player_photo_path).convert('RGBA')
             
+            # NO.1 position
             if i == 0:
                 photo_x = 835
                 photo_y = 395
                 score_x = 844
                 score_y = 720
+
+            # # NO.2 position
             elif i == 1:
                 photo_x = 447
                 photo_y = 520
                 score_x = 456
                 score_y = 846
+
+            # NO.13 position
             elif i == 2:
                 photo_x = 1223
                 photo_y = 520
