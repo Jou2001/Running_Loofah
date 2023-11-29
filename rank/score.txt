@@ -1,3 +1,2 @@
-350,./rank/Player/player1.png
-265,./rank/Player/player3.png
-255,./rank/Player/player2.png
+199,./rank/Player/player1.png
+57,./rank/Player/player2.png

@@ -18,7 +18,7 @@ from moviepy.editor import *
 import mediapipe as mp
 from Ranking import Make_Leaderboard
 
-GAME_TIME = 30
+GAME_TIME = 60
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
@@ -121,7 +121,7 @@ def draw_start() :
 # movement exercises
 def draw_intro() :
     global cap
-
+    screen.blit(Material.do_the_following, (0,0))
     MoviePlay( Material.do_the_following_mp4 )
 
     key_pressed = pygame.key.get_pressed()
@@ -236,7 +236,6 @@ def draw_init() :
     time = 0
     past = pygame.time.get_ticks()
 
-
     while time != 3 :
         timer.tick(fps)
         time, past = times_1(time, past)
@@ -256,7 +255,20 @@ def draw_init() :
     faceOK = HeadPlusBody.Photograph( screen, fps, timer, cap ) 
 
     Material.start321_mp3.play()
-    MoviePlay( Material.start321_mp4 ) 
+    # MoviePlay( Material.start321_mp4 ) 
+    time = 0
+    past = pygame.time.get_ticks()
+    while time < 4 : # 0 1 2 3
+      timer.tick(fps)
+      num = 3 - time # 3 2 1 0
+      time, past = times_1(time, past)
+      screen.blit(Material.count_m[num], (0,0))
+
+      for event in pygame.event.get() :
+        if event.type == pygame.QUIT :
+          pygame.quit()
+
+      pygame.display.update()
 
     Material.load_image = []
     for i in range( 16 ) :
@@ -723,7 +735,7 @@ def end_animate() :
     x_min = grounds.get_sprite(0).rect.x
     grounds.get_sprite(0).end = 1
     a_player.get_sprite(0).end = 1
-    if a_player.get_sprite(0).rect.y < Material.PLAYER_Y :
+    if a_player.get_sprite(0).rect.y != Material.PLAYER_Y :
         a_player.get_sprite(0).rect.y = Material.PLAYER_Y
 
     for i in range(1, len(grounds)) :
@@ -756,7 +768,7 @@ def end_animate() :
   
     # 地板縮小 、 填補空隙(前進) 
     time = 0
-    screen.blit(Material.background4_img, (0,0))
+    screen.blit(Material.background3_img, (0,0))
     past = pygame.time.get_ticks()
 
     time = 0
@@ -784,7 +796,7 @@ def end_animate() :
     while not end :
         timer.tick(fps)
         time, past = times_1(time, past)  
-        screen.blit(Material.background4_img, (0,0))
+        screen.blit(Material.background3_img, (0,0))
         # minimize ground and player
         if num < 6 : 
           '''
@@ -917,9 +929,6 @@ def run():
       draw_start()
       draw_intro()
 
-      o = Sun()
-      back_sprites.add(o)
-
       while running :       
           # get input
           timer.tick(fps)
@@ -928,14 +937,14 @@ def run():
                 # open camera
                 if not pygame.mixer.music.get_busy() :
                     pygame.mixer_music.load(os.path.join("mp3", "startMusic.mp3"))
-                    pygame.mixer_music.set_volume(0.1)
+                    #pygame.mixer_music.set_volume(0.5)
                     pygame.mixer_music.play()
                     pass
 
                 draw_init()
                 
                 pygame.mixer_music.load(os.path.join("mp3", "game_music.mp3"))
-                pygame.mixer_music.set_volume(0.1)
+                #pygame.mixer_music.set_volume(0.5)
                 pygame.mixer_music.play()
                 # init timer
                 time = 0
@@ -945,7 +954,8 @@ def run():
                 show_init = False
                 all_sprites = pygame.sprite.Group()
                 obstacles = pygame.sprite.Group()
-
+                o = Sun()
+                back_sprites.add(o)
                 total_len = 0
                 for i in range(0, Material.GROUND_NUM) :
                     ground = Ground()
@@ -1007,7 +1017,7 @@ def run():
               pygame.display.update()
              
               # display
-              screen.blit(Material.background4_img, (0,0))
+              screen.blit(Material.background3_img, (0,0))
               backornot = random.randrange( 0, 60 )
               if backornot == 4 :
                 o = Cloud()
@@ -1020,7 +1030,7 @@ def run():
               back_sprites.draw(screen)
               all_sprites.draw(screen)
               screen.blit(preview, ( 0, int(1000*Material.COMMOM_R) ) )
-              draw_health(screen, player.health, int(120*Material.COMMOM_R_W), int(64*Material.COMMOM_R_H) )
+              draw_health(screen, player.health, int(130*Material.COMMOM_R_W), int(75*Material.COMMOM_R_H) )
               screen.blit(Material.healthstate_head, (int(20*Material.COMMOM_R_W),int(20*Material.COMMOM_R_H)))
               
               Material.draw_text( screen, "Score: " + str(player.score), int(40*Material.COMMOM_R), Material.S_WIDTH*7/8, Material.BAR_HEIGHT + int(40*Material.COMMOM_R), WHITE ) # show score in screen
@@ -1103,7 +1113,8 @@ def run():
                     screen.blit(Material.background1_img, (0,0))
                     pygame.mixer.music.stop()
                     pygame.mixer.stop()
-                    Material.lose_mp3.play()           
+                    Material.lose_mp3.play()  
+                    screen.blit(Material.lose, (0,0))         
                     MoviePlay( Material.lose_mp4 )
                     
                     for shelf in all_sprites :
@@ -1135,6 +1146,7 @@ def run():
                     pygame.mixer.music.stop()
                     pygame.mixer.stop()
                     Material.win_mp3.play()
+                    screen.blit(Material.win, (0,0))  
                     MoviePlay( Material.win_mp4 ) 
                     
                     for shelf in all_sprites :

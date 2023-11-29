@@ -48,9 +48,21 @@ background1_img = pygame.transform.scale( background1_img, (S_WIDTH, S_HEIGHT) )
 background2_img = pygame.image.load(os.path.join("img", "background02.png")).convert()
 background2_img = pygame.transform.scale( background2_img, (S_WIDTH, S_HEIGHT) )
 background3_img = pygame.image.load(os.path.join("img", "background03.png")).convert()
-background3_img = pygame.transform.scale( background3_img, (1920*COMMOM_R, 1200*COMMOM_R) )
+background3_img = pygame.transform.scale( background3_img, (S_WIDTH, S_HEIGHT) )
 background4_img = pygame.image.load(os.path.join("img", "background04.png")).convert()
 background4_img = pygame.transform.scale( background4_img, (S_WIDTH, S_HEIGHT) )
+count_m = []
+for i in range(4) :
+  image = pygame.image.load(os.path.join("img", str(i) + "_m.png")).convert()
+  image = pygame.transform.scale( image, (S_WIDTH, S_HEIGHT) )
+  count_m.append( image )
+
+do_the_following = pygame.image.load(os.path.join("img", "do_the_following.png")).convert()
+do_the_following = pygame.transform.scale( do_the_following, (S_WIDTH, S_HEIGHT) )
+lose = pygame.image.load(os.path.join("img", "lose.png")).convert()
+lose = pygame.transform.scale( lose, (S_WIDTH, S_HEIGHT) )
+win = pygame.image.load(os.path.join("img", "win.png")).convert()
+win = pygame.transform.scale( win, (S_WIDTH, S_HEIGHT) )
 
 GROUND_NUM = math.ceil(S_WIDTH / int(420*COMMOM_R)) + 1
 ground_img = []
